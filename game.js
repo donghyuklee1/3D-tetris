@@ -754,40 +754,72 @@ class Tetris3D {
     rotatePiece(axis, reverse = false) {
         const newBlocks = this.rotateBlocks(this.currentPiece.blocks, axis, reverse);
         
+        // 먼저 현재 위치에서 회전 시도
         if (!this.checkCollision(this.currentPiece.position, newBlocks)) {
             this.currentPiece.blocks = newBlocks;
             this.createPieceVisual(); // 그림자도 함께 업데이트됨
             this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
             return true;
         }
-        return false;
+        
+        // 벽킥 시도 - 회전이 불가능할 때 위치를 조정해서 회전 시도
+        const wallKickOffsets = [
+            [0, 0, 0],   // 원래 위치
+            [1, 0, 0],   // 오른쪽으로 1칸
+            [-1, 0, 0],  // 왼쪽으로 1칸
+            [0, 0, 1],   // 앞쪽으로 1칸
+            [0, 0, -1],  // 뒤쪽으로 1칸
+            [0, 1, 0],   // 위쪽으로 1칸
+            [0, -1, 0]   // 아래쪽으로 1칸
+        ];
+        
+        for (const offset of wallKickOffsets) {
+            const newPosition = {
+                x: this.currentPiece.position.x + offset[0],
+                y: this.currentPiece.position.y + offset[1],
+                z: this.currentPiece.position.z + offset[2]
+            };
+            
+            if (!this.checkCollision(newPosition, newBlocks)) {
+                this.currentPiece.position = newPosition;
+                this.currentPiece.blocks = newBlocks;
+                this.createPieceVisual(); // 그림자도 함께 업데이트됨
+                this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
+                return true;
+            }
+        }
+        
+        return false; // 모든 시도가 실패
     }
     
     rotateBlocks(blocks, axis, reverse = false) {
-        const angle = reverse ? -Math.PI / 2 : Math.PI / 2;
-        
         return blocks.map(block => {
             let [x, y, z] = block;
             
             switch (axis) {
                 case 'x':
+                    // X축 회전 (Y-Z 평면에서 회전)
                     if (reverse) {
                         return [x, z, -y];
                     } else {
                         return [x, -z, y];
                     }
                 case 'y':
+                    // Y축 회전 (X-Z 평면에서 회전)
                     if (reverse) {
-                        return [z, y, -x];
-                    } else {
                         return [-z, y, x];
+                    } else {
+                        return [z, y, -x];
                     }
                 case 'z':
+                    // Z축 회전 (X-Y 평면에서 회전)
                     if (reverse) {
                         return [-y, x, z];
                     } else {
                         return [y, -x, z];
                     }
+                default:
+                    return [x, y, z];
             }
         });
     }
