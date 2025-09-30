@@ -447,10 +447,10 @@ class Tetris3D {
                     case 'ArrowRight': // X-Y 평면 오른쪽 90도 회전
                         this.rotatePiece('z', false); // Z축 시계방향
                         break;
-                    case 'ArrowUp': // X-Z 평면 위쪽 90도 회전
+                    case 'ArrowUp': // Y축 중심 수직 회전 (위쪽)
                         this.rotatePiece('y', false); // Y축 시계방향
                         break;
-                    case 'ArrowDown': // X-Z 평면 아래쪽 90도 회전
+                    case 'ArrowDown': // Y축 중심 수직 회전 (아래쪽)
                         this.rotatePiece('y', true); // Y축 반시계방향
                         break;
                     case 'KeyQ': // X축 회전 (뒤집기)
@@ -525,7 +525,7 @@ class Tetris3D {
                             this.movePiece(-1, 0, 0); // 왼쪽
                         }
                     } else {
-                        // 세로 스와이프 - X-Z 평면 회전
+                        // 세로 스와이프 - Y축 중심 수직 회전
                         if (deltaY > 0) {
                             this.rotatePiece('y', true); // 아래쪽 스와이프 - Y축 반시계방향
                         } else {
