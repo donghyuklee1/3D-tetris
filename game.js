@@ -428,39 +428,39 @@ class Tetris3D {
                 return;
             }
             
-            switch (event.code) {
-                case 'KeyA': // 왼쪽
-                    this.movePiece(-1, 0, 0);
-                    break;
-                case 'KeyD': // 오른쪽
-                    this.movePiece(1, 0, 0);
-                    break;
-                case 'KeyW': // 위쪽
-                    this.movePiece(0, 0, -1);
-                    break;
-                case 'KeyS': // 아래쪽
-                    this.movePiece(0, 0, 1);
-                    break;
-                case 'KeyQ': // Z축 회전
-                    this.rotatePiece('z');
-                    break;
-                case 'KeyE': // Z축 반대 회전
-                    this.rotatePiece('z', true);
-                    break;
-                case 'KeyR': // Y축 회전
-                    this.rotatePiece('y');
-                    break;
-                case 'KeyF': // X축 회전
-                    this.rotatePiece('x');
-                    break;
-                case 'Space': // 빠른 낙하
-                    event.preventDefault();
-                    this.dropPiece();
-                    break;
-                case 'KeyP': // 일시정지
-                    this.togglePause();
-                    break;
-            }
+                switch (event.code) {
+                    case 'KeyA': // 왼쪽 이동
+                        this.movePiece(-1, 0, 0);
+                        break;
+                    case 'KeyD': // 오른쪽 이동
+                        this.movePiece(1, 0, 0);
+                        break;
+                    case 'KeyW': // 앞쪽 이동
+                        this.movePiece(0, 0, -1);
+                        break;
+                    case 'KeyS': // 뒤쪽 이동
+                        this.movePiece(0, 0, 1);
+                        break;
+                    case 'ArrowLeft': // X-Y 평면 왼쪽 90도 회전
+                        this.rotatePiece('z', true); // Z축 반시계방향
+                        break;
+                    case 'ArrowRight': // X-Y 평면 오른쪽 90도 회전
+                        this.rotatePiece('z', false); // Z축 시계방향
+                        break;
+                    case 'ArrowUp': // X-Z 평면 위쪽 90도 회전
+                        this.rotatePiece('y', false); // Y축 시계방향
+                        break;
+                    case 'ArrowDown': // X-Z 평면 아래쪽 90도 회전
+                        this.rotatePiece('y', true); // Y축 반시계방향
+                        break;
+                    case 'Space': // 빠른 낙하
+                        event.preventDefault();
+                        this.dropPiece();
+                        break;
+                    case 'KeyP': // 일시정지
+                        this.togglePause();
+                        break;
+                }
         });
         
         // 윈도우 리사이즈
@@ -510,25 +510,25 @@ class Tetris3D {
             const deltaTime = touchEndTime - touchStartTime;
             
             // 스와이프 감지 (최소 50px 이동)
-            if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    // 가로 스와이프
-                    if (deltaX > 0) {
-                        this.movePiece(1, 0, 0); // 오른쪽
+                if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        // 가로 스와이프 - 이동
+                        if (deltaX > 0) {
+                            this.movePiece(1, 0, 0); // 오른쪽
+                        } else {
+                            this.movePiece(-1, 0, 0); // 왼쪽
+                        }
                     } else {
-                        this.movePiece(-1, 0, 0); // 왼쪽
+                        // 세로 스와이프 - X-Z 평면 회전
+                        if (deltaY > 0) {
+                            this.rotatePiece('y', true); // 아래쪽 스와이프 - Y축 반시계방향
+                        } else {
+                            this.rotatePiece('y', false); // 위쪽 스와이프 - Y축 시계방향
+                        }
                     }
-                } else {
-                    // 세로 스와이프
-                    if (deltaY > 0) {
-                        this.movePiece(0, 0, 1); // 앞쪽
-                    } else {
-                        this.movePiece(0, 0, -1); // 뒤쪽
-                    }
-                }
             } else if (deltaTime < 200) {
-                // 짧은 터치 (탭) - 회전
-                this.rotatePiece('y');
+                // 짧은 터치 (탭) - X-Y 평면 회전 (Z축)
+                this.rotatePiece('z', false); // 시계방향 회전
             } else {
                 // 긴 터치 - 빠른 낙하
                 this.dropPiece();

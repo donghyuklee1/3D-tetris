@@ -1311,7 +1311,7 @@
                     <div class="control-guide-items">
                         <div class="control-guide-item">
                             <span class="control-icon">👆</span>
-                            <span>탭: 회전</span>
+                            <span>탭: X-Y 평면 회전</span>
                         </div>
                         <div class="control-guide-item">
                             <span class="control-icon">👆👆</span>
@@ -1319,11 +1319,15 @@
                         </div>
                         <div class="control-guide-item">
                             <span class="control-icon">👈👉</span>
-                            <span>스와이프: 이동</span>
+                            <span>좌우스와이프: 이동</span>
+                        </div>
+                        <div class="control-guide-item">
+                            <span class="control-icon">⬆️⬇️</span>
+                            <span>상하스와이프: X-Z 회전</span>
                         </div>
                         <div class="control-guide-item">
                             <span class="control-icon">⏱️</span>
-                            <span>길게누르기: 낙하</span>
+                            <span>길게누르기: 빠른낙하</span>
                         </div>
                     </div>
                 </div>
@@ -1384,21 +1388,16 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Firebase 설정 (실제 프로젝트 생성 후 아래 정보를 실제 값으로 교체하세요)
-        const firebaseConfig = null; // 임시 비활성화
         
-        // 실제 Firebase 프로젝트 생성 후 아래 주석을 해제하고 실제 값으로 교체하세요:
-        /*
         const firebaseConfig = {
-            apiKey: "실제_API_키_여기에_입력",
-            authDomain: "실제_프로젝트_ID.firebaseapp.com",
-            projectId: "실제_프로젝트_ID",
-            storageBucket: "실제_프로젝트_ID.appspot.com",
-            messagingSenderId: "실제_송신자_ID",
-            appId: "실제_앱_ID"
+            apiKey: "AIzaSyCLfNiluLcFqSToINidud5rXAs1OTtxjAY",
+            authDomain: "quadris-792df.firebaseapp.com",
+            projectId: "quadris-792df",
+            storageBucket: "quadris-792df.firebasestorage.app",
+            messagingSenderId: "398553522635",
+            appId: "1:398553522635:web:1a81f16b31f2211a72564e",
+            measurementId: "G-YJKCC7H0V3"
         };
-        */
 
         // Firebase 초기화
         if (firebaseConfig) {
