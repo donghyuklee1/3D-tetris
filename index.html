@@ -602,6 +602,129 @@
             box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
         }
 
+        /* 게임 모드 버튼 스타일 */
+        .mode-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 12px 0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-height: 80px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-btn:hover::before {
+            opacity: 1;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .mode-btn:active {
+            transform: translateY(-1px);
+            transition: all 0.1s ease;
+        }
+
+        .mode-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .mode-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .mode-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .mode-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        /* 각 모드별 색상 테마 */
+        .mode-40 {
+            border-color: rgba(255, 140, 0, 0.3);
+        }
+
+        .mode-40:hover {
+            border-color: rgba(255, 140, 0, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.2);
+        }
+
+        .mode-40 .mode-icon {
+            background: linear-gradient(135deg, #ff8c00, #ff6b35);
+        }
+
+        .mode-blitz {
+            border-color: rgba(255, 69, 0, 0.3);
+        }
+
+        .mode-blitz:hover {
+            border-color: rgba(255, 69, 0, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.2);
+        }
+
+        .mode-blitz .mode-icon {
+            background: linear-gradient(135deg, #ff4500, #dc143c);
+        }
+
+        .mode-zen {
+            border-color: rgba(138, 43, 226, 0.3);
+        }
+
+        .mode-zen:hover {
+            border-color: rgba(138, 43, 226, 0.6);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.2);
+        }
+
+        .mode-zen .mode-icon {
+            background: linear-gradient(135deg, #8a2be2, #9932cc);
+        }
+
         /* 로그인 섹션 스타일 */
         .login-section {
             background: rgba(255, 255, 255, 0.05);
@@ -1075,6 +1198,29 @@
             margin-bottom: 15px;
             color: #ff69b4;
             font-weight: 500;
+        }
+
+        #gameMode {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #00ff88;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        #timer {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #ff6b35;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+        }
+
+        #planes {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #ff8c00;
+            font-weight: 700;
         }
 
         #controls {
@@ -1589,8 +1735,27 @@
             <div class="splash-text">PC version</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
-                <button class="start-btn" onclick="startAnonymousGame()">익명으로 진행하기</button>
-                <button class="start-btn" onclick="startGameWithLogin()">로그인하고 시작하기</button>
+                <button class="mode-btn mode-40" onclick="startGameMode('40planes')">
+                    <div class="mode-icon">40P</div>
+                    <div class="mode-info">
+                        <div class="mode-title">40 PLANES</div>
+                        <div class="mode-desc">COMPLETE 40 FULL PLANES AS QUICKLY AS POSSIBLE</div>
+                    </div>
+                </button>
+                <button class="mode-btn mode-blitz" onclick="startGameMode('blitz')">
+                    <div class="mode-icon">BLZ</div>
+                    <div class="mode-info">
+                        <div class="mode-title">BLITZ</div>
+                        <div class="mode-desc">A TWO-MINUTE RACE AGAINST THE CLOCK</div>
+                    </div>
+                </button>
+                <button class="mode-btn mode-zen" onclick="startGameMode('zen')">
+                    <div class="mode-icon">ZEN</div>
+                    <div class="mode-info">
+                        <div class="mode-title">ZEN</div>
+                        <div class="mode-desc">RELAX OR TRAIN IN THIS NEVERENDING MODE</div>
+                    </div>
+                </button>
                 <button class="start-btn secondary" onclick="showRanking()">Ranking 🏆</button>
             </div>
             
@@ -1599,17 +1764,17 @@
                 <div class="user-profile" id="userProfile">
                     <div class="profile-avatar" id="profileAvatar">👤</div>
                     <div class="profile-info">
-                        <div class="username" id="username">익명 사용자</div>
-                        <div class="best-score" id="bestScore">최고 점수: 없음</div>
+                        <div class="username" id="username">게스트</div>
+                        <div class="best-score" id="bestScore">로그인하여 기록을 저장하세요</div>
                     </div>
                 </div>
                 
                 <div class="login-controls" id="loginControls">
                     <div class="input-group">
                         <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20">
-                        <button class="auth-btn" id="authBtn" onclick="toggleAuth()">시작하기</button>
+                        <button class="auth-btn" id="authBtn" onclick="toggleAuth()">로그인</button>
                     </div>
-                    <div class="auth-status" id="authStatus">닉네임을 설정하고 게임을 시작하세요</div>
+                    <div class="auth-status" id="authStatus">게임을 플레이하려면 로그인하세요</div>
                 </div>
             </div>
             <div class="footer">@made by 💙 with 동혁 (ft. 세윤)</div>
@@ -1621,8 +1786,11 @@
         <div id="gameUI">
             <div id="topBar">
                 <div id="gameInfo">
+                    <div id="gameMode">모드: ZEN</div>
                     <div id="score">점수: 0</div>
                     <div id="level">레벨: 1</div>
+                    <div id="timer" style="display: none;">시간: 00:00</div>
+                    <div id="planes" style="display: none;">완성된 판: 0/40</div>
                     <div id="controls">
                         <div class="control-section">
                             <strong>🎮 이동</strong>
@@ -1813,67 +1981,6 @@
         let game = null;
         let gameStarted = false;
 
-        function startAnonymousGame() {
-            console.log('startAnonymousGame 함수 호출됨');
-            console.log('익명 게임 시작 중...');
-            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
-            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
-            
-            document.getElementById('splashScreen').classList.add('fade-out');
-            document.getElementById('loading').style.display = 'block';
-            
-            setTimeout(() => {
-                try {
-                    document.getElementById('splashScreen').style.display = 'none';
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    if (!gameStarted) {
-                        console.log('Tetris3D 인스턴스 생성 중...');
-                        
-                        // Three.js 로드 확인
-                        if (typeof THREE === 'undefined') {
-                            throw new Error('Three.js가 로드되지 않았습니다!');
-                        }
-                        
-                        // Canvas 요소 확인
-                        const canvas = document.getElementById('gameCanvas');
-                        if (!canvas) {
-                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
-                        }
-                        
-                        game = new Tetris3D();
-                        gameStarted = true;
-                        
-                        // 익명 게임 모드 설정 (랭킹 비활성화)
-                        game.isAnonymousMode = true;
-                        game.currentUser = {
-                            uid: 'anonymous_' + Date.now(),
-                            nickname: '익명 사용자',
-                            displayName: '익명 사용자'
-                        };
-                        
-                        // 사용자 상태 업데이트
-                        updateUserStatus();
-                        
-                        // 모바일 컨트롤 가이드 표시
-                        showMobileControlsIfNeeded();
-                        
-                        console.log('익명 게임 시작 완료!');
-                    }
-                } catch (error) {
-                    console.error('게임 시작 중 오류 발생:', error);
-                    console.error('오류 스택:', error.stack);
-                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
-                    
-                    // 오류 발생 시 스플래시 화면으로 돌아가기
-                    setTimeout(() => {
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('splashScreen').style.display = 'flex';
-                        document.getElementById('splashScreen').classList.remove('fade-out');
-                    }, 3000);
-                }
-            }, 500);
-        }
 
         function startGame() {
             // 기존 startGame 함수는 로그인된 게임용으로 유지
@@ -2245,23 +2352,32 @@
             showMobileControlsIfNeeded();
             
             // 버튼 이벤트 리스너 추가 (안전장치)
-            const anonymousBtn = document.querySelector('.start-btn[onclick="startAnonymousGame()"]');
-            const loginBtn = document.querySelector('.start-btn[onclick="startGameWithLogin()"]');
+            const mode40Btn = document.querySelector('.mode-btn[onclick="startGameMode(\'40planes\')"]');
+            const modeBlitzBtn = document.querySelector('.mode-btn[onclick="startGameMode(\'blitz\')"]');
+            const modeZenBtn = document.querySelector('.mode-btn[onclick="startGameMode(\'zen\')"]');
             const rankingBtn = document.querySelector('.start-btn[onclick="showRanking()"]');
             
-            if (anonymousBtn) {
-                anonymousBtn.addEventListener('click', (e) => {
+            if (mode40Btn) {
+                mode40Btn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    console.log('익명 게임 버튼 클릭됨');
-                    startAnonymousGame();
+                    console.log('40 Planes 버튼 클릭됨');
+                    startGameMode('40planes');
                 });
             }
             
-            if (loginBtn) {
-                loginBtn.addEventListener('click', (e) => {
+            if (modeBlitzBtn) {
+                modeBlitzBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    console.log('로그인 게임 버튼 클릭됨');
-                    startGameWithLogin();
+                    console.log('Blitz 버튼 클릭됨');
+                    startGameMode('blitz');
+                });
+            }
+            
+            if (modeZenBtn) {
+                modeZenBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('ZEN 버튼 클릭됨');
+                    startGameMode('zen');
                 });
             }
             
@@ -2279,13 +2395,16 @@
             showMobileControlsIfNeeded();
         });
 
-        function startGameWithLogin() {
-            console.log('startGameWithLogin 함수 호출됨');
+        // 게임 모드 시작 함수
+        function startGameMode(mode) {
+            console.log(`${mode} 모드 시작`);
+            
+            // 로그인 상태 확인
             const nicknameInput = document.getElementById('nicknameInput');
             const nickname = nicknameInput.value.trim();
             
             if (!nickname) {
-                updateAuthStatus('로그인하려면 닉네임을 입력해주세요', 'error');
+                updateAuthStatus('게임을 시작하려면 닉네임을 입력해주세요', 'error');
                 nicknameInput.focus();
                 return;
             }
@@ -2296,18 +2415,70 @@
                 return;
             }
             
-            // 닉네임이 입력되어 있으면 바로 게임 시작
-            if (game && game.currentUser) {
-                // 이미 로그인된 상태
-                startGame();
-            } else {
-                // 로그인 후 게임 시작
-                toggleAuth().then(() => {
-                    if (game && game.currentUser) {
-                        startGame();
+            // 로그인 후 게임 시작
+            toggleAuth().then(() => {
+                if (game && game.currentUser) {
+                    startGame(mode);
+                }
+            });
+        }
+
+        // 기존 startGame 함수 수정 (모드 파라미터 추가)
+        function startGame(gameMode = 'zen') {
+            console.log(`${gameMode} 모드로 게임 시작 중...`);
+            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
+            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
+            
+            document.getElementById('splashScreen').classList.add('fade-out');
+            document.getElementById('loading').style.display = 'block';
+            
+            setTimeout(() => {
+                try {
+                    document.getElementById('splashScreen').style.display = 'none';
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (!gameStarted) {
+                        console.log('Tetris3D 인스턴스 생성 중...');
+                        
+                        // Three.js 로드 확인
+                        if (typeof THREE === 'undefined') {
+                            throw new Error('Three.js가 로드되지 않았습니다!');
+                        }
+                        
+                        // Canvas 요소 확인
+                        const canvas = document.getElementById('gameCanvas');
+                        if (!canvas) {
+                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
+                        }
+                        
+                        game = new Tetris3D();
+                        game.gameMode = gameMode; // 게임 모드 설정
+                        gameStarted = true;
+                        
+                        // Firebase 인증 설정
+                        setupFirebaseAuth();
+                        
+                        // 사용자 상태 업데이트
+                        updateUserStatus();
+                        
+                        // 모바일 컨트롤 가이드 표시
+                        showMobileControlsIfNeeded();
+                        
+                        console.log(`${gameMode} 모드 게임 시작 완료!`);
                     }
-                });
-            }
+                } catch (error) {
+                    console.error('게임 시작 중 오류 발생:', error);
+                    console.error('오류 스택:', error.stack);
+                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
+                    
+                    // 오류 발생 시 스플래시 화면으로 돌아가기
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('splashScreen').style.display = 'flex';
+                        document.getElementById('splashScreen').classList.remove('fade-out');
+                    }, 3000);
+                }
+            }, 500);
         }
     </script>
 </body>
