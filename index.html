@@ -725,109 +725,6 @@
             background: linear-gradient(135deg, #8a2be2, #9932cc);
         }
 
-        /* 로그인 섹션 스타일 */
-        .login-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            margin-top: 20px;
-            min-width: 350px;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .profile-info {
-            flex: 1;
-        }
-
-        .username {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 5px;
-        }
-
-        .best-score {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        #nicknameInput {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 1rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        #nicknameInput:focus {
-            outline: none;
-            border-color: rgba(255, 140, 0, 0.5);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.2);
-        }
-
-        #nicknameInput::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .auth-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .auth-status {
-            text-align: center;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-        }
 
         /* 모바일 최적화 */
         @media (max-width: 768px) {
@@ -856,47 +753,6 @@
                 margin: 8px 0;
             }
             
-            .login-section {
-                min-width: 90%;
-                margin: 15px auto;
-                padding: 20px;
-            }
-            
-            .user-profile {
-                padding: 12px;
-                gap: 12px;
-            }
-            
-            .profile-avatar {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-            }
-            
-            .username {
-                font-size: 1rem;
-            }
-            
-            .best-score {
-                font-size: 0.8rem;
-            }
-            
-            .input-group {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            #nicknameInput {
-                width: 100%;
-                font-size: 1rem;
-                padding: 14px 16px;
-            }
-            
-            .auth-btn {
-                width: 100%;
-                padding: 14px 20px;
-                font-size: 1rem;
-            }
             
             /* 게임 화면 모바일 최적화 */
             #gameContainer {
@@ -1095,32 +951,6 @@
                 padding: 10px 15px;
             }
             
-            .login-section {
-                padding: 15px;
-            }
-            
-            .user-profile {
-                padding: 10px;
-            }
-            
-            .profile-avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-            
-            .input-group {
-                flex-direction: row;
-            }
-            
-            #nicknameInput {
-                flex: 1;
-            }
-            
-            .auth-btn {
-                width: auto;
-                min-width: 100px;
-            }
         }
 
         @keyframes smoothGradientMove {
@@ -1759,24 +1589,6 @@
                 <button class="start-btn secondary" onclick="showRanking()">Ranking 🏆</button>
             </div>
             
-            <!-- 로그인 섹션 -->
-            <div class="login-section">
-                <div class="user-profile" id="userProfile">
-                    <div class="profile-avatar" id="profileAvatar">👤</div>
-                    <div class="profile-info">
-                        <div class="username" id="username">게스트</div>
-                        <div class="best-score" id="bestScore">로그인하여 기록을 저장하세요</div>
-                    </div>
-                </div>
-                
-                <div class="login-controls" id="loginControls">
-                    <div class="input-group">
-                        <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20">
-                        <button class="auth-btn" id="authBtn" onclick="toggleAuth()">로그인</button>
-                    </div>
-                    <div class="auth-status" id="authStatus">게임을 플레이하려면 로그인하세요</div>
-                </div>
-            </div>
             <div class="footer">@made by 💙 with 동혁 (ft. 세윤)</div>
         </div>
 
@@ -1982,62 +1794,6 @@
         let gameStarted = false;
 
 
-        function startGame() {
-            // 기존 startGame 함수는 로그인된 게임용으로 유지
-            console.log('로그인 게임 시작 중...');
-            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
-            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
-            
-            document.getElementById('splashScreen').classList.add('fade-out');
-            document.getElementById('loading').style.display = 'block';
-            
-            setTimeout(() => {
-                try {
-                    document.getElementById('splashScreen').style.display = 'none';
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    if (!gameStarted) {
-                        console.log('Tetris3D 인스턴스 생성 중...');
-                        
-                        // Three.js 로드 확인
-                        if (typeof THREE === 'undefined') {
-                            throw new Error('Three.js가 로드되지 않았습니다!');
-                        }
-                        
-                        // Canvas 요소 확인
-                        const canvas = document.getElementById('gameCanvas');
-                        if (!canvas) {
-                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
-                        }
-                        
-                        game = new Tetris3D();
-                        gameStarted = true;
-                        
-                        // Firebase 인증 설정
-                        setupFirebaseAuth();
-                        
-                        // 사용자 상태 업데이트
-                        updateUserStatus();
-                        
-                        // 모바일 컨트롤 가이드 표시
-                        showMobileControlsIfNeeded();
-                        
-                        console.log('게임 시작 완료!');
-                    }
-                } catch (error) {
-                    console.error('게임 시작 중 오류 발생:', error);
-                    console.error('오류 스택:', error.stack);
-                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
-                    
-                    // 오류 발생 시 스플래시 화면으로 돌아가기
-                    setTimeout(() => {
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('splashScreen').style.display = 'flex';
-                        document.getElementById('splashScreen').classList.remove('fade-out');
-                    }, 3000);
-                }
-            }, 500);
-        }
 
         function restartGame() {
             if (game) {
@@ -2169,154 +1925,12 @@
             document.getElementById('rankingModal').classList.remove('show');
         }
 
-        // 닉네임 설정 및 인증 함수들
-        async function toggleAuth() {
-            console.log('toggleAuth 함수 호출됨');
-            const nicknameInput = document.getElementById('nicknameInput');
-            const authBtn = document.getElementById('authBtn');
-            const nickname = nicknameInput.value.trim();
-
-            if (!nickname) {
-                updateAuthStatus('닉네임을 입력해주세요', 'error');
-                return;
-            }
-
-            if (nickname.length < 2) {
-                updateAuthStatus('닉네임은 2자 이상 입력해주세요', 'error');
-                return;
-            }
-
-            if (nickname.length > 20) {
-                updateAuthStatus('닉네임은 20자 이하로 입력해주세요', 'error');
-                return;
-            }
-
-            try {
-                authBtn.disabled = true;
-                authBtn.textContent = '처리 중...';
-                
-                if (game && game.currentUser) {
-                    // 로그아웃
-                    await game.signOut();
-                    updateAuthStatus('로그아웃되었습니다', 'success');
-                } else {
-                    // 게임이 시작되지 않았으면 먼저 게임을 시작
-                    if (!game) {
-                        updateAuthStatus('게임을 먼저 시작해주세요', 'error');
-                        return;
-                    }
-                    
-                    // 닉네임으로 로그인
-                    await game.signInWithNickname(nickname);
-                    updateAuthStatus('로그인 성공! 게임을 시작하세요', 'success');
-                }
-            } catch (error) {
-                console.error('인증 오류:', error);
-                updateAuthStatus('인증 중 오류가 발생했습니다: ' + error.message, 'error');
-            } finally {
-                authBtn.disabled = false;
-                authBtn.textContent = game && game.currentUser ? '로그아웃' : '시작하기';
-                updateUserStatus();
-            }
-        }
-
-        function updateAuthStatus(message, type = 'info') {
-            const authStatus = document.getElementById('authStatus');
-            authStatus.textContent = message;
-            
-            if (type === 'error') {
-                authStatus.style.color = '#ff6b6b';
-            } else if (type === 'success') {
-                authStatus.style.color = '#4ecdc4';
-            } else {
-                authStatus.style.color = 'rgba(255, 255, 255, 0.7)';
-            }
-        }
-
-        // Firebase 인증 상태 모니터링
-        function setupFirebaseAuth() {
-            if (window.firebaseOnAuthStateChanged && window.firebaseAuth) {
-                window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
-                    if (user) {
-                        console.log('사용자 로그인:', user);
-                        if (game) {
-                            game.currentUser = user;
-                            updateUserStatus();
-                            loadUserBestScore();
-                        }
-                    } else {
-                        console.log('사용자 로그아웃');
-                        if (game) {
-                            game.currentUser = null;
-                            game.userBestScore = 0;
-                            updateUserStatus();
-                        }
-                    }
-                });
-            } else {
-                // Firebase가 비활성화된 상태 - 로컬 모드로 실행
-            }
-        }
-
-        function updateUserStatus() {
-            const username = document.getElementById('username');
-            const bestScore = document.getElementById('bestScore');
-            const authBtn = document.getElementById('authBtn');
-            const nicknameInput = document.getElementById('nicknameInput');
-            
-            if (game && game.currentUser) {
-                const userName = game.currentUser.nickname || game.currentUser.displayName || '익명 사용자';
-                username.textContent = userName;
-                
-                if (game.userBestScore > 0) {
-                    bestScore.textContent = `최고 점수: ${game.userBestScore.toLocaleString()}`;
-                } else {
-                    bestScore.textContent = '최고 점수: 없음';
-                }
-                
-                authBtn.textContent = '로그아웃';
-                authBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
-                nicknameInput.disabled = true;
-                nicknameInput.value = userName;
-                updateAuthStatus('로그인됨 - 게임을 시작하세요!', 'success');
-            } else {
-                username.textContent = '익명 사용자';
-                bestScore.textContent = '최고 점수: 없음';
-                authBtn.textContent = '시작하기';
-                authBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-                nicknameInput.disabled = false;
-                nicknameInput.value = '';
-                updateAuthStatus('닉네임을 설정하고 게임을 시작하세요', 'info');
-            }
-        }
-
-        async function loadUserBestScore() {
-            if (game && game.currentUser && window.firebaseDb) {
-                try {
-                    const docRef = window.firebaseDoc(window.firebaseDb, 'userScores', game.currentUser.uid);
-                    const docSnap = await window.firebaseGetDoc(docRef);
-                    if (docSnap.exists()) {
-                        game.userBestScore = docSnap.data().score;
-                        updateUserStatus();
-                    }
-                } catch (error) {
-                    console.error('개인 최고 점수 로드 실패:', error);
-                }
-            }
-        }
 
         // 엔터 키 이벤트 처리
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Enter') {
-                if (!gameStarted) {
-                    startGame();
-                } else {
-                    // 닉네임 입력 필드에서 엔터 키
-                    const nicknameInput = document.getElementById('nicknameInput');
-                    if (document.activeElement === nicknameInput && nicknameInput.value.trim()) {
-                        toggleAuth();
-                    }
-                }
+            if (e.code === 'Enter' && !gameStarted) {
+                // 엔터 키로 ZEN 모드 시작
+                startGameMode('zen');
             }
         });
 
@@ -2399,28 +2013,8 @@
         function startGameMode(mode) {
             console.log(`${mode} 모드 시작`);
             
-            // 로그인 상태 확인
-            const nicknameInput = document.getElementById('nicknameInput');
-            const nickname = nicknameInput.value.trim();
-            
-            if (!nickname) {
-                updateAuthStatus('게임을 시작하려면 닉네임을 입력해주세요', 'error');
-                nicknameInput.focus();
-                return;
-            }
-            
-            if (nickname.length < 2) {
-                updateAuthStatus('닉네임은 2자 이상 입력해주세요', 'error');
-                nicknameInput.focus();
-                return;
-            }
-            
-            // 로그인 후 게임 시작
-            toggleAuth().then(() => {
-                if (game && game.currentUser) {
-                    startGame(mode);
-                }
-            });
+            // 바로 게임 시작 (로그인 없이)
+            startGame(mode);
         }
 
         // 기존 startGame 함수 수정 (모드 파라미터 추가)
@@ -2455,11 +2049,13 @@
                         game.gameMode = gameMode; // 게임 모드 설정
                         gameStarted = true;
                         
-                        // Firebase 인증 설정
-                        setupFirebaseAuth();
-                        
-                        // 사용자 상태 업데이트
-                        updateUserStatus();
+                        // 익명 게임 모드 설정
+                        game.isAnonymousMode = true;
+                        game.currentUser = {
+                            uid: 'anonymous_' + Date.now(),
+                            nickname: '게스트',
+                            displayName: '게스트'
+                        };
                         
                         // 모바일 컨트롤 가이드 표시
                         showMobileControlsIfNeeded();
