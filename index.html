@@ -1612,11 +1612,17 @@
         }
 
         function loadBasicRanking() {
+            console.log('loadBasicRanking 함수 호출됨');
             const rankingList = document.getElementById('rankingList');
             const totalPlayers = document.getElementById('totalPlayers');
             const yourRank = document.getElementById('yourRank');
             
-            if (!rankingList) return;
+            console.log('랭킹 요소들:', { rankingList, totalPlayers, yourRank });
+            
+            if (!rankingList) {
+                console.error('rankingList 요소를 찾을 수 없습니다!');
+                return;
+            }
             
             // 로컬 스토리지에서 랭킹 로드
             const localRanking = JSON.parse(localStorage.getItem('tetrisRanking') || '[]');

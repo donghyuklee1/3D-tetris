@@ -597,6 +597,10 @@ class Tetris3D {
     }
     
     spawnNewPiece() {
+        console.log('새 피스 생성 시작');
+        console.log('현재 pieceGroup.children.length:', this.pieceGroup.children.length);
+        console.log('현재 fixedBlocks.children.length:', this.fixedBlocks.children.length);
+        
         const pieceType = this.pieceTypes[Math.floor(Math.random() * this.pieceTypes.length)];
         this.currentPiece = {
             type: pieceType,
@@ -605,8 +609,12 @@ class Tetris3D {
             blocks: [...pieceType.blocks]
         };
         
+        console.log('생성된 피스:', this.currentPiece);
+        
         this.createPieceVisual();
         this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
+        
+        console.log('피스 생성 후 pieceGroup.children.length:', this.pieceGroup.children.length);
         
         // 게임 오버 체크
         if (this.checkCollision(this.currentPiece.position, this.currentPiece.blocks)) {
@@ -618,9 +626,17 @@ class Tetris3D {
     }
     
     createPieceVisual() {
+        console.log('createPieceVisual 시작 - 기존 피스 제거 전');
+        console.log('pieceGroup.children.length:', this.pieceGroup.children.length);
+        console.log('shadowGroup.children.length:', this.shadowGroup.children.length);
+        
         // 기존 피스 시각화 제거
         this.pieceGroup.clear();
         this.shadowGroup.clear();
+        
+        console.log('기존 피스 제거 후');
+        console.log('pieceGroup.children.length:', this.pieceGroup.children.length);
+        console.log('shadowGroup.children.length:', this.shadowGroup.children.length);
         
         // 현재 피스의 블록들 생성
         this.currentPiece.blocks.forEach(block => {
@@ -797,6 +813,9 @@ class Tetris3D {
     }
     
     placePiece() {
+        console.log('placePiece 시작');
+        console.log('현재 피스를 보드에 고정 중...');
+        
         // 현재 피스를 보드에 고정
         this.currentPiece.blocks.forEach(block => {
             const x = Math.round(this.currentPiece.position.x + block[0]);
@@ -811,14 +830,22 @@ class Tetris3D {
             }
         });
         
+        console.log('피스 고정 완료, 레이어 체크 시작');
+        
         // 완성된 레이어 체크 및 제거
         this.checkAndClearLayers();
+        
+        console.log('고정된 블록들 업데이트 시작');
         
         // 고정된 블록들 다시 생성
         this.updateFixedBlocks();
         
+        console.log('새 피스 생성 시작');
+        
         // 새 피스 생성
         this.spawnNewPiece();
+        
+        console.log('placePiece 완료');
     }
     
     checkAndClearLayers() {
