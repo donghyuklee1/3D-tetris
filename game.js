@@ -441,23 +441,23 @@ class Tetris3D {
                     case 'KeyS': // 뒤쪽 이동
                         this.movePiece(0, 0, 1);
                         break;
-                    case 'ArrowLeft': // X-Y 평면 왼쪽 90도 회전
-                        this.rotatePiece('z', true); // Z축 반시계방향
+                    case 'ArrowLeft': // Y축 반시계방향 회전 (좌우 회전)
+                        this.rotatePiece('y', true);
                         break;
-                    case 'ArrowRight': // X-Y 평면 오른쪽 90도 회전
-                        this.rotatePiece('z', false); // Z축 시계방향
+                    case 'ArrowRight': // Y축 시계방향 회전 (좌우 회전)
+                        this.rotatePiece('y', false);
                         break;
-                    case 'ArrowUp': // X축 회전 (위쪽)
-                        this.rotatePiece('x', false); // X축 시계방향
+                    case 'ArrowUp': // X축 시계방향 회전 (앞뒤 회전)
+                        this.rotatePiece('x', false);
                         break;
-                    case 'ArrowDown': // X축 회전 (아래쪽)
-                        this.rotatePiece('x', true); // X축 반시계방향
+                    case 'ArrowDown': // X축 반시계방향 회전 (앞뒤 회전)
+                        this.rotatePiece('x', true);
                         break;
-                    case 'KeyQ': // X축 회전 (뒤집기)
-                        this.rotatePiece('x', false); // X축 시계방향
+                    case 'KeyQ': // Z축 반시계방향 회전 (상하 회전)
+                        this.rotatePiece('z', true);
                         break;
-                    case 'KeyE': // X축 반대 회전 (뒤집기)
-                        this.rotatePiece('x', true); // X축 반시계방향
+                    case 'KeyE': // Z축 시계방향 회전 (상하 회전)
+                        this.rotatePiece('z', false);
                         break;
                     case 'Space': // 빠른 낙하
                         event.preventDefault();
@@ -518,14 +518,14 @@ class Tetris3D {
             // 스와이프 감지 (최소 50px 이동)
                 if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        // 가로 스와이프 - 이동
+                        // 가로 스와이프 - Y축 회전 (좌우 회전)
                         if (deltaX > 0) {
-                            this.movePiece(1, 0, 0); // 오른쪽
+                            this.rotatePiece('y', false); // 오른쪽 스와이프 - Y축 시계방향
                         } else {
-                            this.movePiece(-1, 0, 0); // 왼쪽
+                            this.rotatePiece('y', true); // 왼쪽 스와이프 - Y축 반시계방향
                         }
                     } else {
-                        // 세로 스와이프 - X축 회전
+                        // 세로 스와이프 - X축 회전 (앞뒤 회전)
                         if (deltaY > 0) {
                             this.rotatePiece('x', true); // 아래쪽 스와이프 - X축 반시계방향
                         } else {
@@ -533,7 +533,7 @@ class Tetris3D {
                         }
                     }
             } else if (deltaTime < 200) {
-                // 짧은 터치 (탭) - X-Y 평면 회전 (Z축)
+                // 짧은 터치 (탭) - Z축 회전 (상하 회전)
                 this.rotatePiece('z', false); // 시계방향 회전
             } else {
                 // 긴 터치 - 빠른 낙하
@@ -548,8 +548,8 @@ class Tetris3D {
             const tapLength = currentTime - lastTapTime;
             
             if (tapLength < 500 && tapLength > 0) {
-                // 더블 탭 - X축 회전 (뒤집기)
-                this.rotatePiece('x', false); // X축 시계방향
+                // 더블 탭 - Z축 회전 (상하 회전)
+                this.rotatePiece('z', true); // Z축 반시계방향
             }
             
             lastTapTime = currentTime;
@@ -804,31 +804,28 @@ class Tetris3D {
             
             switch (axis) {
                 case 'x':
-                    // X축 회전 (블록을 바닥과 평행하게 회전)
+                    // X축 회전: 앞뒤 회전 (Y-Z 평면에서 회전)
+                    // 시계방향: (y,z) -> (-z,y), 반시계방향: (y,z) -> (z,-y)
                     if (reverse) {
-                        // X축 반시계방향 90도: 수직 블록을 수평으로 회전
-                        return [x, -z, y];
+                        return [x, z, -y]; // 반시계방향
                     } else {
-                        // X축 시계방향 90도: 수직 블록을 수평으로 회전
-                        return [x, z, -y];
+                        return [x, -z, y]; // 시계방향
                     }
                 case 'y':
-                    // Y축 회전 (X-Z 평면에서 90도 회전)
+                    // Y축 회전: 좌우 회전 (X-Z 평면에서 회전)
+                    // 시계방향: (x,z) -> (z,-x), 반시계방향: (x,z) -> (-z,x)
                     if (reverse) {
-                        // Y축 반시계방향 90도: (x,z) -> (z,-x)
-                        return [z, y, -x];
+                        return [-z, y, x]; // 반시계방향
                     } else {
-                        // Y축 시계방향 90도: (x,z) -> (-z,x)
-                        return [-z, y, x];
+                        return [z, y, -x]; // 시계방향
                     }
                 case 'z':
-                    // Z축 회전 (X-Y 평면에서 90도 회전)
+                    // Z축 회전: 상하 회전 (X-Y 평면에서 회전)
+                    // 시계방향: (x,y) -> (-y,x), 반시계방향: (x,y) -> (y,-x)
                     if (reverse) {
-                        // Z축 반시계방향 90도: (x,y) -> (y,-x)
-                        return [y, -x, z];
+                        return [y, -x, z]; // 반시계방향
                     } else {
-                        // Z축 시계방향 90도: (x,y) -> (-y,x)
-                        return [-y, x, z];
+                        return [-y, x, z]; // 시계방향
                     }
                 default:
                     return [x, y, z];
