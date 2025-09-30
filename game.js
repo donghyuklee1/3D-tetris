@@ -325,34 +325,8 @@ class Tetris3D {
                 }
             }
             
-            // 고정된 블록들 생성 (메인 게임과 동일)
-            for (let y = 0; y < this.BOARD_HEIGHT; y++) {
-                for (let z = 0; z < this.BOARD_DEPTH; z++) {
-                    for (let x = 0; x < this.BOARD_WIDTH; x++) {
-                        if (this.board[y][z][x] === 1) {
-                            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-                            const blockColor = this.boardColors[y][z][x] || 0x888888;
-                            const material = new THREE.MeshPhysicalMaterial({
-                                color: blockColor,
-                                transparent: true,
-                                opacity: 0.9,
-                                roughness: 0.2,
-                                metalness: 0.0,
-                                clearcoat: 0.6,
-                                clearcoatRoughness: 0.2,
-                                transmission: 0.2,
-                                thickness: 0.3,
-                                envMapIntensity: 0.8
-                            });
-                            const cube = new THREE.Mesh(geometry, material);
-                            cube.castShadow = true;
-                            cube.receiveShadow = true;
-                            cube.position.set(x, y, z);
-                            this.miniScene.add(cube);
-                        }
-                    }
-                }
-            }
+            // 미니맵에서는 고정된 블록들도 생성하지 않음 - 메인 게임과의 완전한 분리
+            // 미니맵은 보드 틀만 표시하여 참조용으로만 사용
             
             // 현재 블록은 미니맵에서 생성하지 않음 - 메인 게임과의 동기화 문제 방지
             /*
@@ -884,8 +858,12 @@ class Tetris3D {
         this.gameRunning = false;
         document.getElementById('finalScore').textContent = this.score;
         
-        // 랭킹에 점수 추가
-        this.addScoreToRanking(this.score);
+        // 익명 모드가 아닐 때만 랭킹에 점수 추가
+        if (!this.isAnonymousMode) {
+            this.addScoreToRanking(this.score);
+        } else {
+            console.log('익명 모드 - 랭킹에 저장되지 않음');
+        }
         
         document.getElementById('gameOverModal').classList.add('show');
     }
@@ -1148,6 +1126,11 @@ class Tetris3D {
                 this.updateMinimap();
             }
         }, 50);
+        
+        // 익명 모드 상태 로그
+        if (this.isAnonymousMode) {
+            console.log('익명 모드로 게임 재시작됨 - 랭킹에 저장되지 않음');
+        }
     }
     
     gameLoop() {

@@ -859,7 +859,7 @@
             <div class="logo">3D TETRIS</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
-                <button class="start-btn" onclick="startGame()">게임 시작</button>
+                <button class="start-btn" onclick="startAnonymousGame()">익명으로 게임하기</button>
                 <button class="start-btn secondary" onclick="showRanking()">🏆 랭킹</button>
             </div>
             
@@ -1038,8 +1038,67 @@
         let game = null;
         let gameStarted = false;
 
+        function startAnonymousGame() {
+            console.log('익명 게임 시작 중...');
+            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
+            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
+            
+            document.getElementById('splashScreen').classList.add('fade-out');
+            document.getElementById('loading').style.display = 'block';
+            
+            setTimeout(() => {
+                try {
+                    document.getElementById('splashScreen').style.display = 'none';
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (!gameStarted) {
+                        console.log('Tetris3D 인스턴스 생성 중...');
+                        
+                        // Three.js 로드 확인
+                        if (typeof THREE === 'undefined') {
+                            throw new Error('Three.js가 로드되지 않았습니다!');
+                        }
+                        
+                        // Canvas 요소 확인
+                        const canvas = document.getElementById('gameCanvas');
+                        if (!canvas) {
+                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
+                        }
+                        
+                        game = new Tetris3D();
+                        gameStarted = true;
+                        
+                        // 익명 게임 모드 설정 (랭킹 비활성화)
+                        game.isAnonymousMode = true;
+                        game.currentUser = {
+                            uid: 'anonymous_' + Date.now(),
+                            nickname: '익명 사용자',
+                            displayName: '익명 사용자'
+                        };
+                        
+                        // 사용자 상태 업데이트
+                        updateUserStatus();
+                        
+                        console.log('익명 게임 시작 완료!');
+                    }
+                } catch (error) {
+                    console.error('게임 시작 중 오류 발생:', error);
+                    console.error('오류 스택:', error.stack);
+                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
+                    
+                    // 오류 발생 시 스플래시 화면으로 돌아가기
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('splashScreen').style.display = 'flex';
+                        document.getElementById('splashScreen').classList.remove('fade-out');
+                    }, 3000);
+                }
+            }, 500);
+        }
+
         function startGame() {
-            console.log('게임 시작 중...');
+            // 기존 startGame 함수는 로그인된 게임용으로 유지
+            console.log('로그인 게임 시작 중...');
             console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
             console.log('Canvas 요소:', document.getElementById('gameCanvas'));
             
