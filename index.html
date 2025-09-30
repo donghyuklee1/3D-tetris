@@ -1237,6 +1237,7 @@
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
                 <button class="start-btn" onclick="startAnonymousGame()">익명으로 진행하기</button>
+                <button class="start-btn" onclick="startGameWithLogin()">로그인하고 시작하기</button>
                 <button class="start-btn secondary" onclick="showRanking()">Ranking 🏆</button>
             </div>
             
@@ -1311,15 +1312,15 @@
                     <div class="control-guide-items">
                 <div class="control-guide-item">
                     <span class="control-icon">👆</span>
-                    <span>탭: Z축 회전 (X축 중심 회전)</span>
+                    <span>탭: Z축 회전 (X-Y 평면 회전)</span>
                 </div>
                 <div class="control-guide-item">
                     <span class="control-icon">👆👆</span>
-                    <span>더블탭: X축 회전 (Z축 중심 회전)</span>
+                    <span>더블탭: Z축 회전 (X-Y 평면 회전)</span>
                 </div>
                 <div class="control-guide-item">
                     <span class="control-icon">👈👉</span>
-                    <span>좌우스와이프: Z축 회전 (X축 중심 회전)</span>
+                    <span>좌우스와이프: Y축 회전 (X-Z 평면 회전)</span>
                 </div>
                 <div class="control-guide-item">
                     <span class="control-icon">⬆️⬇️</span>
@@ -1892,6 +1893,36 @@
         window.addEventListener('resize', () => {
             showMobileControlsIfNeeded();
         });
+
+        function startGameWithLogin() {
+            const nicknameInput = document.getElementById('nicknameInput');
+            const nickname = nicknameInput.value.trim();
+            
+            if (!nickname) {
+                updateAuthStatus('로그인하려면 닉네임을 입력해주세요', 'error');
+                nicknameInput.focus();
+                return;
+            }
+            
+            if (nickname.length < 2) {
+                updateAuthStatus('닉네임은 2자 이상 입력해주세요', 'error');
+                nicknameInput.focus();
+                return;
+            }
+            
+            // 닉네임이 입력되어 있으면 바로 게임 시작
+            if (game && game.currentUser) {
+                // 이미 로그인된 상태
+                startGame();
+            } else {
+                // 로그인 후 게임 시작
+                toggleAuth().then(() => {
+                    if (game && game.currentUser) {
+                        startGame();
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

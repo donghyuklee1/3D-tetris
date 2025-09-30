@@ -442,6 +442,12 @@ class Tetris3D {
                     case 'ArrowDown': // X축 반시계방향 회전 (Z축 중심 회전)
                         this.rotatePiece('x', true);
                         break;
+                    case 'KeyQ': // Z축 반시계방향 회전 (X-Y 평면 회전)
+                        this.rotatePiece('z', true);
+                        break;
+                    case 'KeyE': // Z축 시계방향 회전 (X-Y 평면 회전)
+                        this.rotatePiece('z', false);
+                        break;
                     case 'Space': // 빠른 낙하
                         event.preventDefault();
                         this.dropPiece();
@@ -501,11 +507,11 @@ class Tetris3D {
             // 스와이프 감지 (최소 50px 이동)
                 if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        // 가로 스와이프 - Z축 회전 (X축 중심 회전)
+                        // 가로 스와이프 - Y축 회전 (X-Z 평면 회전)
                         if (deltaX > 0) {
-                            this.rotatePiece('z', false); // 오른쪽 스와이프 - Z축 시계방향
+                            this.rotatePiece('y', false); // 오른쪽 스와이프 - Y축 시계방향
                         } else {
-                            this.rotatePiece('z', true); // 왼쪽 스와이프 - Z축 반시계방향
+                            this.rotatePiece('y', true); // 왼쪽 스와이프 - Y축 반시계방향
                         }
                     } else {
                         // 세로 스와이프 - X축 회전 (Z축 중심 회전)
@@ -516,7 +522,7 @@ class Tetris3D {
                         }
                     }
             } else if (deltaTime < 200) {
-                // 짧은 터치 (탭) - Z축 회전 (X축 중심 회전)
+                // 짧은 터치 (탭) - Z축 회전 (X-Y 평면 회전)
                 this.rotatePiece('z', false); // 시계방향 회전
             } else {
                 // 긴 터치 - 빠른 낙하
@@ -531,8 +537,8 @@ class Tetris3D {
             const tapLength = currentTime - lastTapTime;
             
             if (tapLength < 500 && tapLength > 0) {
-                // 더블 탭 - X축 회전 (Z축 중심 회전)
-                this.rotatePiece('x', false); // X축 시계방향
+                // 더블 탭 - Z축 회전 (X-Y 평면 회전)
+                this.rotatePiece('z', true); // Z축 반시계방향
             }
             
             lastTapTime = currentTime;
@@ -794,8 +800,16 @@ class Tetris3D {
                     } else {
                         return [x, -z, y]; // 시계방향 90도
                     }
+                case 'y':
+                    // Y축 회전: X-Z 평면에서 회전 (측면에서 보는 시점)
+                    // Y축을 중심으로 90도 회전
+                    if (reverse) {
+                        return [-z, y, x]; // 반시계방향 90도
+                    } else {
+                        return [z, y, -x]; // 시계방향 90도
+                    }
                 case 'z':
-                    // Z축 회전: X축을 중심으로 회전 (측면에서 보는 시점)
+                    // Z축 회전: X-Y 평면에서 회전 (바닥에서 보는 시점)
                     // Z축을 중심으로 90도 회전
                     if (reverse) {
                         return [y, -x, z]; // 반시계방향 90도
@@ -1333,8 +1347,8 @@ class Tetris3D {
             // 현재 사용자가 있으면 닉네임 사용
             playerName = this.currentUser.nickname || this.currentUser.displayName || '익명 사용자';
         } else {
-            // 일반 모드에서는 사용자 입력 요청
-            playerName = prompt('플레이어 이름을 입력하세요:', '플레이어');
+            // 일반 모드에서는 기본 이름 사용 (prompt 제거)
+            playerName = '플레이어';
         }
         
         if (playerName) {
