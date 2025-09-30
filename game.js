@@ -141,16 +141,21 @@ class Tetris3D {
             }
         ];
         
-        try {
-            console.log('게임 초기화 시작');
-            this.initializeGame();
-            console.log('게임 초기화 완료');
-            this.setupEventListeners();
-            console.log('이벤트 리스너 설정 완료');
-            this.gameLoop();
-            console.log('게임 루프 시작');
+            try {
+                console.log('게임 초기화 시작');
+                this.initializeGame();
+                console.log('게임 초기화 완료');
+                this.setupEventListeners();
+                console.log('이벤트 리스너 설정 완료');
+                this.gameLoop();
+                console.log('게임 루프 시작');
+            } catch (error) {
+                console.error('게임 초기화 중 오류:', error);
+                console.error('오류 스택:', error.stack);
+                throw error;
+            }
         } catch (error) {
-            console.error('게임 초기화 중 오류:', error);
+            console.error('Tetris3D 생성자에서 오류 발생:', error);
             console.error('오류 스택:', error.stack);
             throw error;
         }
