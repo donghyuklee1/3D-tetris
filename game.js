@@ -1212,10 +1212,26 @@ class Tetris3D {
                 await this.saveUserProfile(nickname);
                 
                 return result.user;
+            } else {
+                // Firebase가 사용 불가능한 경우 로컬 사용자 객체 생성
+                console.log('Firebase 사용 불가 - 로컬 모드로 로그인');
+                this.currentUser = {
+                    uid: 'local_' + Date.now(),
+                    nickname: nickname,
+                    displayName: nickname
+                };
+                return this.currentUser;
             }
         } catch (error) {
             console.error('닉네임 로그인 실패:', error);
-            throw error;
+            // Firebase 실패 시에도 로컬 사용자 객체 생성
+            console.log('Firebase 오류 - 로컬 모드로 로그인');
+            this.currentUser = {
+                uid: 'local_' + Date.now(),
+                nickname: nickname,
+                displayName: nickname
+            };
+            return this.currentUser;
         }
     }
 
