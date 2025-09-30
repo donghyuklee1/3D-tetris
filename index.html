@@ -15,10 +15,10 @@
         body {
             font-family: 'Roboto', sans-serif;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2), transparent 50%),
-                linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #e94560 100%);
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.2), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15), transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1), transparent 50%),
+                linear-gradient(135deg, #0a0a1a 0%, #0f1419 25%, #0a1a2e 50%, #2d1b4e 75%, #1a0f2e 100%);
             overflow: hidden;
             color: white;
             height: 100vh;
@@ -76,10 +76,10 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2), transparent 50%),
-                linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.15), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15), transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1), transparent 50%),
+                linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -100,22 +100,148 @@
                 repeating-linear-gradient(
                     90deg,
                     transparent,
-                    transparent 198px,
-                    rgba(255, 255, 255, 0.01) 200px
+                    transparent 98px,
+                    rgba(0, 255, 255, 0.03) 100px
                 ),
                 repeating-linear-gradient(
                     0deg,
                     transparent,
-                    transparent 198px,
-                    rgba(255, 255, 255, 0.01) 200px
+                    transparent 98px,
+                    rgba(0, 255, 255, 0.03) 100px
                 );
-            animation: scanlines 4s linear infinite;
-            opacity: 0.6;
+            animation: retroScan 4s linear infinite;
+            opacity: 0.8;
+            z-index: 1;
         }
 
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(200px); }
+        #splashScreen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+            animation: retroGlow 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes retroScan {
+            0% { 
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(100px) scale(1.02);
+                opacity: 0.4;
+            }
+            100% { 
+                transform: translateY(200px) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes retroGlow {
+            0% { 
+                opacity: 0.3;
+                filter: blur(0px);
+            }
+            50% {
+                opacity: 0.6;
+                filter: blur(2px);
+            }
+            100% { 
+                opacity: 0.3;
+                filter: blur(0px);
+            }
+        }
+
+        .retro-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 10s linear infinite;
+            z-index: 0;
+        }
+
+        .retro-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 8s linear infinite;
+        }
+
+        .particle:nth-child(1) {
+            left: 20%;
+            animation-delay: 0s;
+            animation-duration: 6s;
+        }
+
+        .particle:nth-child(2) {
+            left: 40%;
+            animation-delay: 1s;
+            animation-duration: 8s;
+        }
+
+        .particle:nth-child(3) {
+            left: 60%;
+            animation-delay: 2s;
+            animation-duration: 7s;
+        }
+
+        .particle:nth-child(4) {
+            left: 80%;
+            animation-delay: 3s;
+            animation-duration: 9s;
+        }
+
+        .particle:nth-child(5) {
+            left: 10%;
+            animation-delay: 4s;
+            animation-duration: 5s;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
         }
 
         #splashScreen.fade-out {
@@ -1263,6 +1389,16 @@
     <div id="gameContainer">
         <!-- 스플래시 화면 -->
         <div id="splashScreen">
+            <!-- 레트로 배경 요소들 -->
+            <div class="retro-grid"></div>
+            <div class="retro-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            
             <div class="logo">QUADRIS</div>
             <div class="splash-text">PC version</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
