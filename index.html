@@ -142,7 +142,7 @@
         }
 
         .logo::before {
-            content: '3D TETRIS';
+            content: 'QUADRIS';
             position: absolute;
             top: 0;
             left: 0;
@@ -151,6 +151,31 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gentleShimmer 3s ease-in-out infinite;
+        }
+
+        .splash-text {
+            position: absolute;
+            top: 60%;
+            right: 15%;
+            color: #ffd700;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transform: rotate(15deg);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: splashPulse 2s ease-in-out infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes splashPulse {
+            0% {
+                transform: rotate(15deg) scale(0.9);
+                opacity: 0.8;
+            }
+            100% {
+                transform: rotate(15deg) scale(1.1);
+                opacity: 1;
+            }
         }
 
         @keyframes gentleGlow {
@@ -1233,7 +1258,8 @@
     <div id="gameContainer">
         <!-- 스플래시 화면 -->
         <div id="splashScreen">
-            <div class="logo">3D TETRIS</div>
+            <div class="logo">QUADRIS</div>
+            <div class="splash-text">PC version</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
                 <button class="start-btn" onclick="startAnonymousGame()">익명으로 진행하기</button>

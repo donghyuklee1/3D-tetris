@@ -627,11 +627,49 @@ class Tetris3D {
         this.createPieceVisual();
         this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
         
-        // 게임 오버 체크
-        if (this.checkCollision(this.currentPiece.position, this.currentPiece.blocks)) {
-            console.log('게임 오버: 새 피스 생성 시 충돌');
+        // 게임 오버 체크 - 높이가 12를 넘는 경우에만
+        if (this.isBoardHeightExceeded()) {
+            console.log('게임 오버: 보드 높이가 12를 초과');
             this.gameOver();
         }
+    }
+    
+    isBoardHeightExceeded() {
+        // 각 x, z 위치에서 가장 높은 블록의 높이를 확인
+        for (let x = 0; x < this.BOARD_WIDTH; x++) {
+            for (let z = 0; z < this.BOARD_DEPTH; z++) {
+                let maxHeight = -1;
+                
+                // y축을 따라 올라가며 가장 높은 블록 찾기
+                for (let y = 0; y < this.BOARD_HEIGHT; y++) {
+                    if (this.board[y][z][x] === 1) {
+                        maxHeight = y;
+                    }
+                }
+                
+                // 현재 떨어지는 블록의 높이도 고려
+                if (this.currentPiece) {
+                    for (const block of this.currentPiece.blocks) {
+                        const blockX = Math.round(this.currentPiece.position.x + block[0]);
+                        const blockY = Math.round(this.currentPiece.position.y - block[1]);
+                        const blockZ = Math.round(this.currentPiece.position.z + block[2]);
+                        
+                        if (blockX === x && blockZ === z && blockY >= 0 && blockY < this.BOARD_HEIGHT) {
+                            if (this.board[blockY][blockZ][blockX] === 0) { // 아직 고정되지 않은 블록
+                                maxHeight = Math.max(maxHeight, blockY);
+                            }
+                        }
+                    }
+                }
+                
+                // 높이가 12 이상이면 게임 오버
+                if (maxHeight >= this.BOARD_HEIGHT - 1) { // 0-based이므로 11 이상이면 12층
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
     
     createPieceVisual() {
