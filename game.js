@@ -446,10 +446,84 @@ class Tetris3D {
             this.renderer.setSize(window.innerWidth, window.innerHeight);
         });
         
+        // 모바일 터치 컨트롤
+        this.setupTouchControls();
+        
         // 재시작 버튼 (HTML에서 직접 처리하므로 제거)
         // document.getElementById('restartBtn').addEventListener('click', () => {
         //     this.restartGame();
         // });
+    }
+
+    setupTouchControls() {
+        // 터치 시작 위치
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        
+        // 캔버스에 터치 이벤트 추가
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!this.gameRunning || this.gamePaused) return;
+            
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (!this.gameRunning || this.gamePaused) return;
+            
+            const touch = e.changedTouches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            const touchEndTime = Date.now();
+            
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const deltaTime = touchEndTime - touchStartTime;
+            
+            // 스와이프 감지 (최소 50px 이동)
+            if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // 가로 스와이프
+                    if (deltaX > 0) {
+                        this.movePiece(1, 0, 0); // 오른쪽
+                    } else {
+                        this.movePiece(-1, 0, 0); // 왼쪽
+                    }
+                } else {
+                    // 세로 스와이프
+                    if (deltaY > 0) {
+                        this.movePiece(0, 0, 1); // 앞쪽
+                    } else {
+                        this.movePiece(0, 0, -1); // 뒤쪽
+                    }
+                }
+            } else if (deltaTime < 200) {
+                // 짧은 터치 (탭) - 회전
+                this.rotatePiece('y');
+            } else {
+                // 긴 터치 - 빠른 낙하
+                this.dropPiece();
+            }
+        });
+        
+        // 더블 탭 감지
+        let lastTapTime = 0;
+        this.canvas.addEventListener('touchend', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // 더블 탭 - 빠른 낙하
+                this.dropPiece();
+            }
+            
+            lastTapTime = currentTime;
+        });
     }
     
     initializeGame() {
