@@ -827,19 +827,12 @@ class Tetris3D {
     }
     
     placePiece() {
-        console.log('placePiece 시작 - 현재 pieceGroup.children.length:', this.pieceGroup.children.length);
-        console.log('placePiece 시작 - 현재 fixedBlocks.children.length:', this.fixedBlocks.children.length);
-        
         // 현재 피스를 보드에 고정
         if (this.currentPiece && this.currentPiece.blocks) {
-            console.log('피스 고정 시작 - 블록 개수:', this.currentPiece.blocks.length);
-            
             this.currentPiece.blocks.forEach((block, index) => {
                 const x = Math.round(this.currentPiece.position.x + block[0]);
                 const y = Math.round(this.currentPiece.position.y - block[1]);
                 const z = Math.round(this.currentPiece.position.z + block[2]);
-                
-                console.log(`블록 ${index + 1} 고정 위치: (${x}, ${y}, ${z})`);
                 
                 if (y >= 0 && y < this.BOARD_HEIGHT && 
                     x >= 0 && x < this.BOARD_WIDTH && 
@@ -854,16 +847,12 @@ class Tetris3D {
             
             // 점수 추가 (Tetrio 방식) - 배치된 블록 개수만큼
             this.addScore(this.currentPiece.blocks.length * 10); // 블록 하나당 10점
-            
-            console.log('피스 고정 완료');
         }
         
         // 현재 피스 그룹 완전히 정리 (먼저 정리)
-        console.log('피스 그룹 정리 시작');
         this.pieceGroup.clear();
         this.shadowGroup.clear();
         this.currentPiece = null;
-        console.log('피스 그룹 정리 완료 - pieceGroup.children.length:', this.pieceGroup.children.length);
         
         // 완성된 레이어 체크 및 제거
         this.checkAndClearLayers();
@@ -873,8 +862,6 @@ class Tetris3D {
         
         // 새 피스 생성
         this.spawnNewPiece();
-        
-        console.log('placePiece 완료');
     }
     
     checkAndClearLayers() {
@@ -909,8 +896,8 @@ class Tetris3D {
             // Tetrio 방식 점수 계산
             const baseScore = [0, 100, 300, 500, 800][layersCleared] || 800;
             this.addScore(baseScore * this.level);
-            this.level = Math.floor(this.score / 1000) + 1;
-            this.dropInterval = Math.max(100, 1000 - (this.level - 1) * 100);
+            this.level = Math.floor(this.score / 2000) + 1; // 레벨업을 2000점마다로 변경
+            this.dropInterval = Math.max(200, 1000 - (this.level - 1) * 50); // 더 천천히 속도 증가
             this.updateUI();
             this.updateFixedBlocks();
         }
@@ -939,18 +926,13 @@ class Tetris3D {
     }
     
     updateFixedBlocks() {
-        console.log('updateFixedBlocks 시작 - 현재 fixedBlocks.children.length:', this.fixedBlocks.children.length);
-        console.log('updateFixedBlocks 시작 - 현재 pieceGroup.children.length:', this.pieceGroup.children.length);
-        
         // 모든 고정된 블록 제거 후 다시 생성
         this.fixedBlocks.clear();
         
-        let blockCount = 0;
         for (let y = 0; y < this.BOARD_HEIGHT; y++) {
             for (let z = 0; z < this.BOARD_DEPTH; z++) {
                 for (let x = 0; x < this.BOARD_WIDTH; x++) {
                     if (this.board[y][z][x] === 1) {
-                        blockCount++;
                         const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
                         const blockColor = this.boardColors[y][z][x] || 0x888888; // 저장된 색상 사용
                         const material = new THREE.MeshPhysicalMaterial({
@@ -974,10 +956,6 @@ class Tetris3D {
                 }
             }
         }
-        
-        console.log('updateFixedBlocks 완료 - 생성된 블록 수:', blockCount);
-        console.log('updateFixedBlocks 완료 - fixedBlocks.children.length:', this.fixedBlocks.children.length);
-        console.log('updateFixedBlocks 완료 - pieceGroup.children.length:', this.pieceGroup.children.length);
     }
     
     updateUI() {
