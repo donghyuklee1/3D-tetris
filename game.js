@@ -23,8 +23,11 @@ class Tetris3D {
         this.dropTime = 0;
         this.dropInterval = 1000; // 1초
         
-        // 랭킹 시스템
-        this.ranking = this.loadRanking();
+        // 랭킹 시스템 (Firebase 연동)
+        this.ranking = [];
+        this.currentUser = null;
+        this.userBestScore = 0;
+        this.loadRanking();
         
         // 미니맵 업데이트 플래그
         this.minimapNeedsUpdate = false;
@@ -858,42 +861,117 @@ class Tetris3D {
     }
     
     loadRanking() {
+        // Firebase에서 랭킹 로드 시도, 실패 시 로컬 스토리지 사용
+        if (window.firebaseDb && window.firebaseCollection && window.firebaseQuery && window.firebaseOrderBy && window.firebaseLimit && window.firebaseGetDocs) {
+            this.loadRankingFromFirebase();
+        } else {
+            this.loadRankingFromLocal();
+        }
+    }
+
+    async loadRankingFromFirebase() {
+        try {
+            const q = window.firebaseQuery(
+                window.firebaseCollection(window.firebaseDb, 'scores'),
+                window.firebaseOrderBy('score', 'desc'),
+                window.firebaseLimit(10)
+            );
+            const querySnapshot = await window.firebaseGetDocs(q);
+            this.ranking = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                this.ranking.push({
+                    id: doc.id,
+                    name: data.name || '익명',
+                    score: data.score,
+                    timestamp: data.timestamp
+                });
+            });
+            console.log('Firebase에서 랭킹 로드 완료:', this.ranking);
+        } catch (error) {
+            console.error('Firebase 랭킹 로드 실패, 로컬 스토리지 사용:', error);
+            this.loadRankingFromLocal();
+        }
+    }
+
+    loadRankingFromLocal() {
         const saved = localStorage.getItem('tetris3d-ranking');
         if (saved) {
-            return JSON.parse(saved);
+            this.ranking = JSON.parse(saved);
+        } else {
+            this.ranking = [
+                { name: '동혁', score: 10000, date: new Date().toISOString() },
+                { name: '세윤', score: 8500, date: new Date().toISOString() },
+                { name: 'AI', score: 7200, date: new Date().toISOString() }
+            ];
         }
-        return [
-            { name: '동혁', score: 10000, date: new Date().toISOString() },
-            { name: '세윤', score: 8500, date: new Date().toISOString() },
-            { name: 'AI', score: 7200, date: new Date().toISOString() }
-        ];
     }
     
     saveRanking() {
         localStorage.setItem('tetris3d-ranking', JSON.stringify(this.ranking));
     }
     
-    addScoreToRanking(score) {
-        // 새 점수 추가
-        const newEntry = {
-            name: 'Player',
-            score: score,
-            date: new Date().toISOString()
-        };
-        
-        this.ranking.push(newEntry);
-        
-        // 점수순으로 정렬
-        this.ranking.sort((a, b) => b.score - a.score);
-        
-        // 상위 10개만 유지
-        this.ranking = this.ranking.slice(0, 10);
-        
-        // 저장
-        this.saveRanking();
-        
-        // UI 업데이트
+    async addScoreToRanking(score) {
+        // Firebase 사용자 확인
+        if (this.currentUser && window.firebaseDb) {
+            await this.saveScoreToFirebase(score);
+        } else {
+            // 로컬 스토리지에 저장
+            this.saveScoreToLocal(score);
+        }
         this.updateRankingUI();
+    }
+
+    async saveScoreToFirebase(score) {
+        try {
+            const userName = this.currentUser.displayName || '익명';
+            const scoreData = {
+                name: userName,
+                score: score,
+                userId: this.currentUser.uid,
+                timestamp: new Date().toISOString()
+            };
+
+            // 개인 최고 점수 업데이트
+            if (score > this.userBestScore) {
+                this.userBestScore = score;
+                await window.firebaseSetDoc(
+                    window.firebaseDoc(window.firebaseDb, 'userScores', this.currentUser.uid),
+                    scoreData
+                );
+            }
+
+            // 전체 랭킹에 추가
+            await window.firebaseSetDoc(
+                window.firebaseDoc(window.firebaseCollection(window.firebaseDb, 'scores')),
+                scoreData
+            );
+
+            console.log('Firebase에 점수 저장 완료:', score);
+            this.loadRankingFromFirebase(); // 랭킹 새로고침
+        } catch (error) {
+            console.error('Firebase 점수 저장 실패:', error);
+            this.saveScoreToLocal(score);
+        }
+    }
+
+    saveScoreToLocal(score) {
+        const playerName = prompt('플레이어 이름을 입력하세요:', '플레이어');
+        if (playerName) {
+            this.ranking.push({
+                name: playerName,
+                score: score,
+                date: new Date().toISOString()
+            });
+            
+            // 점수순으로 정렬 (내림차순)
+            this.ranking.sort((a, b) => b.score - a.score);
+            
+            // 상위 10개만 유지
+            this.ranking = this.ranking.slice(0, 10);
+            
+            this.saveRanking();
+        }
     }
     
     updateRankingUI() {
@@ -1009,6 +1087,35 @@ class Tetris3D {
         
         // 다음 프레임 요청
         requestAnimationFrame(() => this.gameLoop());
+    }
+
+    // Firebase 인증 함수들
+    async signInAnonymously() {
+        try {
+            if (window.firebaseSignIn && window.firebaseAuth) {
+                const result = await window.firebaseSignIn(window.firebaseAuth);
+                console.log('익명 로그인 성공:', result.user);
+                this.currentUser = result.user;
+                return result.user;
+            }
+        } catch (error) {
+            console.error('익명 로그인 실패:', error);
+            throw error;
+        }
+    }
+
+    async signOut() {
+        try {
+            if (window.firebaseAuth && window.firebaseAuth.signOut) {
+                await window.firebaseAuth.signOut();
+                console.log('로그아웃 성공');
+                this.currentUser = null;
+                this.userBestScore = 0;
+            }
+        } catch (error) {
+            console.error('로그아웃 실패:', error);
+            throw error;
+        }
     }
 }
 

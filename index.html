@@ -386,15 +386,16 @@
             border: none;
             color: white;
             padding: 12px 16px;
-            border-radius: 50%;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
             backdrop-filter: blur(10px);
             font-family: 'Roboto', sans-serif;
-            font-size: 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
             pointer-events: auto;
-            width: 48px;
-            height: 48px;
+            min-width: 80px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -610,9 +611,13 @@
         <!-- 스플래시 화면 -->
         <div id="splashScreen">
             <div class="logo">3D TETRIS</div>
-            <div class="subtitle">차원을 넘나드는 테트리스의 새로운 경험</div>
+                <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <button class="start-btn" onclick="startGame()">게임 시작</button>
             <button class="start-btn" onclick="showRanking()" style="margin-top: 15px; font-size: 1rem; padding: 12px 30px;">🏆 랭킹</button>
+            <div id="userStatus" style="margin-top: 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+                <div id="loginStatus">익명으로 플레이 중</div>
+                <button id="loginBtn" onclick="toggleLogin()" style="margin-top: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 8px 16px; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">로그인</button>
+            </div>
             <div class="footer">@made by 💙 with 동혁 (ft. 세윤)</div>
         </div>
 
@@ -656,8 +661,8 @@
                 </div>
                 
                 <div id="gameControls">
-                    <button class="control-btn" onclick="restartGame()">🔄</button>
-                    <button class="control-btn" onclick="togglePause()">⏸️</button>
+                    <button class="control-btn" onclick="restartGame()">재시작</button>
+                    <button class="control-btn" onclick="togglePause()">일시정지</button>
                 </div>
             </div>
         </div>
@@ -709,6 +714,44 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module">
+        // Firebase 설정
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase 설정 (실제 프로젝트 설정으로 교체 필요)
+        // Firebase Console에서 프로젝트 생성 후 설정 복사하여 교체하세요
+        const firebaseConfig = {
+            apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            authDomain: "quadris-3d-tetris.firebaseapp.com",
+            projectId: "quadris-3d-tetris",
+            storageBucket: "quadris-3d-tetris.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 전역 변수로 Firebase 인스턴스 제공
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseSignIn = signInAnonymously;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseGetDoc = getDoc;
+        window.firebaseCollection = collection;
+        window.firebaseQuery = query;
+        window.firebaseOrderBy = orderBy;
+        window.firebaseLimit = limit;
+        window.firebaseGetDocs = getDocs;
+
+        console.log('Firebase 초기화 완료');
+    </script>
     <script src="game.js"></script>
     <script>
         let game = null;
@@ -728,6 +771,10 @@
                         console.log('Tetris3D 인스턴스 생성 중...');
                         game = new Tetris3D();
                         gameStarted = true;
+                        
+                        // Firebase 인증 설정
+                        setupFirebaseAuth();
+                        
                         console.log('게임 시작 완료!');
                     }
                 } catch (error) {
@@ -781,10 +828,79 @@
 
         function showRanking() {
             document.getElementById('rankingModal').classList.add('show');
+            if (game) {
+                game.updateRankingUI(); // 랭킹 모달이 열릴 때마다 최신 랭킹을 표시
+            }
         }
 
         function hideRanking() {
             document.getElementById('rankingModal').classList.remove('show');
+        }
+
+        // Firebase 인증 함수들
+        async function toggleLogin() {
+            if (game && game.currentUser) {
+                // 로그아웃
+                await game.signOut();
+            } else {
+                // 로그인
+                await game.signInAnonymously();
+            }
+        }
+
+        // Firebase 인증 상태 모니터링
+        function setupFirebaseAuth() {
+            if (window.firebaseOnAuthStateChanged && window.firebaseAuth) {
+                window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
+                    if (user) {
+                        console.log('사용자 로그인:', user);
+                        if (game) {
+                            game.currentUser = user;
+                            updateUserStatus();
+                            loadUserBestScore();
+                        }
+                    } else {
+                        console.log('사용자 로그아웃');
+                        if (game) {
+                            game.currentUser = null;
+                            game.userBestScore = 0;
+                            updateUserStatus();
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateUserStatus() {
+            const loginStatus = document.getElementById('loginStatus');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (game && game.currentUser) {
+                const userName = game.currentUser.displayName || '익명 사용자';
+                loginStatus.textContent = `${userName}으로 로그인됨`;
+                if (game.userBestScore > 0) {
+                    loginStatus.textContent += ` (최고 점수: ${game.userBestScore})`;
+                }
+                loginBtn.textContent = '로그아웃';
+            } else {
+                loginStatus.textContent = '익명으로 플레이 중';
+                loginBtn.textContent = '로그인';
+            }
+        }
+
+        async function loadUserBestScore() {
+            if (game && game.currentUser && window.firebaseDb) {
+                try {
+                    const docRef = window.firebaseDoc(window.firebaseDb, 'userScores', game.currentUser.uid);
+                    const docSnap = await window.firebaseGetDoc(docRef);
+                    if (docSnap.exists()) {
+                        game.userBestScore = docSnap.data().score;
+                        updateUserStatus();
+                    }
+                } catch (error) {
+                    console.error('개인 최고 점수 로드 실패:', error);
+                }
+            }
         }
 
         // 엔터 키로 게임 시작
