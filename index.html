@@ -201,40 +201,17 @@
 
         .retro-grid {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: -100px;
+            left: -100px;
+            right: -100px;
+            bottom: -100px;
             background-image: 
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(0, 255, 255, 0.08) 0px,
-                    rgba(0, 255, 255, 0.08) 1px,
-                    transparent 1px,
-                    transparent 50px
-                ),
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 255, 255, 0.08) 0px,
-                    rgba(0, 255, 255, 0.08) 1px,
-                    transparent 1px,
-                    transparent 50px
-                ),
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(0, 255, 255, 0.04) 0px,
-                    rgba(0, 255, 255, 0.04) 1px,
-                    transparent 1px,
-                    transparent 25px
-                ),
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 255, 255, 0.04) 0px,
-                    rgba(0, 255, 255, 0.04) 1px,
-                    transparent 1px,
-                    transparent 25px
-                );
-            animation: gridFlow 8s linear infinite;
+                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 25px 25px, 25px 25px;
+            animation: gridMove 3s linear infinite;
             z-index: 0;
         }
 
@@ -376,41 +353,25 @@
             animation-duration: 6.6s;
         }
 
-        @keyframes gridFlow {
+        @keyframes gridMove {
             0% { 
-                transform: translate(0, 0) scale(1);
+                transform: translate(0, 0);
                 opacity: 0.8;
-            }
-            12.5% { 
-                transform: translate(6.25px, 6.25px) scale(1.01);
-                opacity: 0.85;
             }
             25% { 
-                transform: translate(12.5px, 12.5px) scale(1.02);
+                transform: translate(12.5px, 12.5px);
                 opacity: 0.9;
-            }
-            37.5% { 
-                transform: translate(18.75px, 18.75px) scale(1.01);
-                opacity: 0.85;
             }
             50% { 
-                transform: translate(25px, 25px) scale(1);
-                opacity: 0.8;
-            }
-            62.5% { 
-                transform: translate(31.25px, 31.25px) scale(1.01);
-                opacity: 0.85;
+                transform: translate(25px, 25px);
+                opacity: 0.7;
             }
             75% { 
-                transform: translate(37.5px, 37.5px) scale(1.02);
+                transform: translate(37.5px, 37.5px);
                 opacity: 0.9;
             }
-            87.5% { 
-                transform: translate(43.75px, 43.75px) scale(1.01);
-                opacity: 0.85;
-            }
             100% { 
-                transform: translate(50px, 50px) scale(1);
+                transform: translate(50px, 50px);
                 opacity: 0.8;
             }
         }
