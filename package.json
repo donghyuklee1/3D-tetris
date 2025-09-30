@@ -1,0 +1,24 @@
+{
+  "name": "3d-tetris",
+  "version": "1.0.0",
+  "description": "3D Tetris game built with Three.js",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000 -c-1",
+    "dev": "npx live-server --port=8000 --open=/index.html"
+  },
+  "keywords": [
+    "tetris",
+    "3d",
+    "three.js",
+    "game",
+    "webgl"
+  ],
+  "author": "3D Tetris Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  }
+}

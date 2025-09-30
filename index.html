@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 테트리스</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2), transparent 50%),
+                linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #e94560 100%);
+            overflow: hidden;
+            color: white;
+            height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 98px,
+                    rgba(255, 255, 255, 0.02) 100px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 98px,
+                    rgba(255, 255, 255, 0.02) 100px
+                );
+            animation: subtleScanlines 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes subtleScanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 스플래시 화면 */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2), transparent 50%),
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease-out;
+            overflow: hidden;
+        }
+
+        #splashScreen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 198px,
+                    rgba(255, 255, 255, 0.01) 200px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 198px,
+                    rgba(255, 255, 255, 0.01) 200px
+                );
+            animation: scanlines 4s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(200px); }
+        }
+
+        #splashScreen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 4.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #00f5ff, #ff69b4, #ffff00, #00ff00);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: 
+                gentleGlow 6s ease-in-out infinite alternate,
+                smoothGradientShift 8s ease-in-out infinite;
+            position: relative;
+            filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.3));
+        }
+
+        .logo::before {
+            content: '3D TETRIS';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gentleShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes gentleGlow {
+            0% { 
+                filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.4)) drop-shadow(0 0 25px rgba(255, 105, 180, 0.2));
+            }
+            50% { 
+                filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.5)) drop-shadow(0 0 30px rgba(255, 255, 0, 0.3));
+            }
+            100% { 
+                filter: drop-shadow(0 0 25px rgba(255, 255, 0, 0.4)) drop-shadow(0 0 35px rgba(0, 255, 0, 0.2));
+            }
+        }
+
+        @keyframes smoothGradientShift {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes gentleShimmer {
+            0% { 
+                opacity: 0;
+                transform: translateX(-50px) scaleX(0.5);
+            }
+            50% { 
+                opacity: 1;
+                transform: translateX(0) scaleX(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateX(50px) scaleX(0.5);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            animation: gentlePulse 4s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { 
+                opacity: 0.9;
+                transform: translateY(0);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: translateY(-2px);
+            }
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7aa);
+            background-size: 300% 300%;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+            overflow: hidden;
+            animation: smoothGradientMove 5s ease-in-out infinite;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .start-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .start-btn:active {
+            transform: translateY(-1px) scale(1.01);
+            transition: all 0.1s ease;
+        }
+
+        @keyframes smoothGradientMove {
+            0% { background-position: 0% 50%; }
+            33% { background-position: 100% 50%; }
+            66% { background-position: 50% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 푸터 */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            z-index: 1001;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* 게임 UI */
+        #gameUI {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #topBar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        #gameInfo {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 200px;
+        }
+
+        #score {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #00f5ff;
+        }
+
+        #level {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #ff69b4;
+            font-weight: 500;
+        }
+
+        #controls {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .control-section {
+            margin-bottom: 12px;
+        }
+
+        .control-section strong {
+            color: #ffff00;
+            font-size: 0.95rem;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tip {
+            background: rgba(0, 245, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #00f5ff;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        #gameControls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.2rem;
+            pointer-events: auto;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 게임 오버 모달 */
+        #gameOverModal, #rankingModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        #gameOverModal.show, #rankingModal.show {
+            display: flex;
+        }
+
+        /* 랭킹 스타일 */
+        #rankingList {
+            margin: 20px 0;
+            min-height: 200px;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .ranking-item:nth-child(1) {
+            border-left-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .ranking-item:nth-child(2) {
+            border-left-color: #c0c0c0;
+            background: rgba(192, 192, 192, 0.1);
+        }
+
+        .ranking-item:nth-child(3) {
+            border-left-color: #cd7f32;
+            background: rgba(205, 127, 50, 0.1);
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #4ecdc4;
+            min-width: 50px;
+        }
+
+        .player-name {
+            flex: 1;
+            margin: 0 20px;
+            font-weight: 500;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #ff6b6b;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .modal-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 로딩 화면 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            z-index: 150;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #00f5ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            #topBar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            #gameInfo {
+                width: 100%;
+                max-width: none;
+            }
+            
+            #gameControls {
+                position: relative;
+                top: auto;
+                right: auto;
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- 스플래시 화면 -->
+        <div id="splashScreen">
+            <div class="logo">3D TETRIS</div>
+            <div class="subtitle">차원을 넘나드는 테트리스의 새로운 경험</div>
+            <button class="start-btn" onclick="startGame()">게임 시작</button>
+            <button class="start-btn" onclick="showRanking()" style="margin-top: 15px; font-size: 1rem; padding: 12px 30px;">🏆 랭킹</button>
+            <div class="footer">@made by 💙 with 동혁 (ft. 세윤)</div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- 게임 UI -->
+        <div id="gameUI">
+            <div id="topBar">
+                <div id="gameInfo">
+                    <div id="score">점수: 0</div>
+                    <div id="level">레벨: 1</div>
+                    <div id="controls">
+                        <div class="control-section">
+                            <strong>🎮 이동</strong>
+                            <div class="control-row">
+                                <span>위</span><span class="key">W</span>
+                                <span>아래</span><span class="key">S</span>
+                                <span>좌</span><span class="key">A</span>
+                                <span>우</span><span class="key">D</span>
+                            </div>
+                        </div>
+                        <div class="control-section">
+                            <strong>🔄 회전</strong>
+                            <div class="control-row">
+                                <span>Z축</span><span class="key">Q/E</span>
+                                <span>Y축</span><span class="key">R</span>
+                                <span>X축</span><span class="key">F</span>
+                            </div>
+                        </div>
+                        <div class="control-section">
+                            <strong>⚡ 기타</strong>
+                            <div class="control-row">
+                                <span>빠른 낙하</span><span class="key">Space</span>
+                                <span>일시정지</span><span class="key">P</span>
+                            </div>
+                        </div>
+                        <div class="tip">
+                            💡 바닥의 빛나는 그림자를 보고 블록의 착지 위치를 확인하세요!
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="gameControls">
+                    <button class="control-btn" onclick="restartGame()">🔄</button>
+                    <button class="control-btn" onclick="togglePause()">⏸️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 게임 오버 모달 -->
+        <div id="gameOverModal">
+            <div class="modal-content">
+                <h2>게임 오버!</h2>
+                <p>최종 점수: <span id="finalScore">0</span></p>
+                <div class="modal-buttons">
+                    <button class="modal-btn primary" onclick="restartGame()">다시 시작</button>
+                    <button class="modal-btn secondary" onclick="showSplash()">메인으로</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 랭킹 모달 -->
+        <div id="rankingModal">
+            <div class="modal-content">
+                <h2>🏆 랭킹</h2>
+                <div id="rankingList">
+                    <div class="ranking-item">
+                        <span class="rank">1위</span>
+                        <span class="player-name">동혁</span>
+                        <span class="score">10,000</span>
+                    </div>
+                    <div class="ranking-item">
+                        <span class="rank">2위</span>
+                        <span class="player-name">세윤</span>
+                        <span class="score">8,500</span>
+                    </div>
+                    <div class="ranking-item">
+                        <span class="rank">3위</span>
+                        <span class="player-name">AI</span>
+                        <span class="score">7,200</span>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn primary" onclick="hideRanking()">닫기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로딩 화면 -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <div>3D 테트리스 로딩 중...</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+    <script>
+        let game = null;
+        let gameStarted = false;
+
+        function startGame() {
+            console.log('게임 시작 중...');
+            document.getElementById('splashScreen').classList.add('fade-out');
+            document.getElementById('loading').style.display = 'block';
+            
+            setTimeout(() => {
+                try {
+                    document.getElementById('splashScreen').style.display = 'none';
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (!gameStarted) {
+                        console.log('Tetris3D 인스턴스 생성 중...');
+                        game = new Tetris3D();
+                        gameStarted = true;
+                        console.log('게임 시작 완료!');
+                    }
+                } catch (error) {
+                    console.error('게임 시작 중 오류 발생:', error);
+                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
+                }
+            }, 500);
+        }
+
+        function restartGame() {
+            if (game) {
+                console.log('게임 재시작 중...');
+                game.restartGame();
+                document.getElementById('gameOverModal').classList.remove('show');
+            } else {
+                console.log('게임 인스턴스가 없습니다.');
+            }
+        }
+
+        function togglePause() {
+            if (game) {
+                game.togglePause();
+            } else {
+                console.log('게임이 시작되지 않았습니다.');
+            }
+        }
+
+            function showSplash() {
+                document.getElementById('gameOverModal').classList.remove('show');
+                document.getElementById('rankingModal').classList.remove('show');
+                document.getElementById('splashScreen').style.display = 'flex';
+                document.getElementById('splashScreen').classList.remove('fade-out');
+                
+                // 게임 인스턴스 완전 정리
+                if (game) {
+                    game.gameRunning = false; // 게임 루프 중단
+                    game = null;
+                }
+                
+                // 미니맵 완전히 제거
+                const miniCanvas = document.getElementById('miniCanvas');
+                if (miniCanvas) {
+                    miniCanvas.remove();
+                }
+                
+                // 게임 상태 초기화
+                gameStarted = false;
+                
+                console.log('스플래시 화면으로 복귀 완료');
+            }
+
+        function showRanking() {
+            document.getElementById('rankingModal').classList.add('show');
+        }
+
+        function hideRanking() {
+            document.getElementById('rankingModal').classList.remove('show');
+        }
+
+        // 엔터 키로 게임 시작
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Enter' && !gameStarted) {
+                startGame();
+            }
+        });
+
+        // 페이지 로드 시 디버깅 정보
+        window.addEventListener('load', () => {
+            console.log('페이지 로드 완료');
+            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
+            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
+            
+            // Three.js가 로드되었는지 확인
+            if (typeof THREE === 'undefined') {
+                console.error('Three.js가 로드되지 않았습니다!');
+                alert('Three.js 라이브러리 로드에 실패했습니다. 인터넷 연결을 확인해주세요.');
+            } else {
+                console.log('Three.js 버전:', THREE.REVISION);
+            }
+        });
+    </script>
+</body>
+</html>
