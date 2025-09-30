@@ -325,8 +325,34 @@ class Tetris3D {
                 }
             }
             
-            // 미니맵에서는 고정된 블록들도 생성하지 않음 - 메인 게임과의 완전한 분리
-            // 미니맵은 보드 틀만 표시하여 참조용으로만 사용
+            // 고정된 블록들 생성 (미니맵에서도 표시)
+            for (let y = 0; y < this.BOARD_HEIGHT; y++) {
+                for (let z = 0; z < this.BOARD_DEPTH; z++) {
+                    for (let x = 0; x < this.BOARD_WIDTH; x++) {
+                        if (this.board[y][z][x] === 1) {
+                            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+                            const blockColor = this.boardColors[y][z][x] || 0x888888;
+                            const material = new THREE.MeshPhysicalMaterial({
+                                color: blockColor,
+                                transparent: true,
+                                opacity: 0.9,
+                                roughness: 0.2,
+                                metalness: 0.0,
+                                clearcoat: 0.6,
+                                clearcoatRoughness: 0.2,
+                                transmission: 0.2,
+                                thickness: 0.3,
+                                envMapIntensity: 0.8
+                            });
+                            const cube = new THREE.Mesh(geometry, material);
+                            cube.castShadow = true;
+                            cube.receiveShadow = true;
+                            cube.position.set(x, y, z);
+                            this.miniScene.add(cube);
+                        }
+                    }
+                }
+            }
             
             // 현재 블록은 미니맵에서 생성하지 않음 - 메인 게임과의 동기화 문제 방지
             /*
@@ -597,10 +623,6 @@ class Tetris3D {
     }
     
     spawnNewPiece() {
-        console.log('새 피스 생성 시작');
-        console.log('현재 pieceGroup.children.length:', this.pieceGroup.children.length);
-        console.log('현재 fixedBlocks.children.length:', this.fixedBlocks.children.length);
-        
         const pieceType = this.pieceTypes[Math.floor(Math.random() * this.pieceTypes.length)];
         this.currentPiece = {
             type: pieceType,
@@ -609,34 +631,20 @@ class Tetris3D {
             blocks: [...pieceType.blocks]
         };
         
-        console.log('생성된 피스:', this.currentPiece);
-        
         this.createPieceVisual();
         this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
-        
-        console.log('피스 생성 후 pieceGroup.children.length:', this.pieceGroup.children.length);
         
         // 게임 오버 체크
         if (this.checkCollision(this.currentPiece.position, this.currentPiece.blocks)) {
             console.log('게임 오버: 새 피스 생성 시 충돌');
-            console.log('피스 위치:', this.currentPiece.position);
-            console.log('피스 블록들:', this.currentPiece.blocks);
             this.gameOver();
         }
     }
     
     createPieceVisual() {
-        console.log('createPieceVisual 시작 - 기존 피스 제거 전');
-        console.log('pieceGroup.children.length:', this.pieceGroup.children.length);
-        console.log('shadowGroup.children.length:', this.shadowGroup.children.length);
-        
         // 기존 피스 시각화 제거
         this.pieceGroup.clear();
         this.shadowGroup.clear();
-        
-        console.log('기존 피스 제거 후');
-        console.log('pieceGroup.children.length:', this.pieceGroup.children.length);
-        console.log('shadowGroup.children.length:', this.shadowGroup.children.length);
         
         // 현재 피스의 블록들 생성
         this.currentPiece.blocks.forEach(block => {
@@ -813,9 +821,6 @@ class Tetris3D {
     }
     
     placePiece() {
-        console.log('placePiece 시작');
-        console.log('현재 피스를 보드에 고정 중...');
-        
         // 현재 피스를 보드에 고정
         this.currentPiece.blocks.forEach(block => {
             const x = Math.round(this.currentPiece.position.x + block[0]);
@@ -830,22 +835,19 @@ class Tetris3D {
             }
         });
         
-        console.log('피스 고정 완료, 레이어 체크 시작');
-        
         // 완성된 레이어 체크 및 제거
         this.checkAndClearLayers();
-        
-        console.log('고정된 블록들 업데이트 시작');
         
         // 고정된 블록들 다시 생성
         this.updateFixedBlocks();
         
-        console.log('새 피스 생성 시작');
+        // 현재 피스 그룹 완전히 정리
+        this.pieceGroup.clear();
+        this.shadowGroup.clear();
+        this.currentPiece = null;
         
         // 새 피스 생성
         this.spawnNewPiece();
-        
-        console.log('placePiece 완료');
     }
     
     checkAndClearLayers() {
@@ -959,12 +961,9 @@ class Tetris3D {
         this.gameRunning = false;
         document.getElementById('finalScore').textContent = this.score;
         
-        // 익명 모드가 아닐 때만 랭킹에 점수 추가
-        if (!this.isAnonymousMode) {
-            this.addScoreToRanking(this.score);
-        } else {
-            console.log('익명 모드 - 랭킹에 저장되지 않음');
-        }
+        // 모든 모드에서 랭킹에 점수 추가 (익명 모드도 포함)
+        console.log('게임 오버 - 점수 랭킹에 추가:', this.score);
+        this.addScoreToRanking(this.score);
         
         document.getElementById('gameOverModal').classList.add('show');
     }
@@ -1094,7 +1093,16 @@ class Tetris3D {
     }
 
     saveScoreToLocal(score) {
-        const playerName = prompt('플레이어 이름을 입력하세요:', '플레이어');
+        let playerName;
+        
+        if (this.isAnonymousMode) {
+            // 익명 모드에서는 자동으로 이름 설정
+            playerName = '익명 사용자';
+        } else {
+            // 일반 모드에서는 사용자 입력 요청
+            playerName = prompt('플레이어 이름을 입력하세요:', '플레이어');
+        }
+        
         if (playerName) {
             this.ranking.push({
                 name: playerName,
@@ -1109,6 +1117,7 @@ class Tetris3D {
             this.ranking = this.ranking.slice(0, 10);
             
             this.saveRanking();
+            console.log('로컬 랭킹에 저장됨:', playerName, score);
         }
     }
     
