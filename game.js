@@ -804,25 +804,31 @@ class Tetris3D {
             
             switch (axis) {
                 case 'x':
-                    // X축 회전 (Y-Z 평면에서 회전)
+                    // X축 회전 (Y-Z 평면에서 90도 회전)
                     if (reverse) {
+                        // X축 반시계방향 90도: (y,z) -> (z,-y)
                         return [x, z, -y];
                     } else {
+                        // X축 시계방향 90도: (y,z) -> (-z,y)
                         return [x, -z, y];
                     }
                 case 'y':
-                    // Y축 회전 (X-Z 평면에서 회전)
+                    // Y축 회전 (X-Z 평면에서 90도 회전)
                     if (reverse) {
-                        return [-z, y, x];
-                    } else {
+                        // Y축 반시계방향 90도: (x,z) -> (z,-x)
                         return [z, y, -x];
+                    } else {
+                        // Y축 시계방향 90도: (x,z) -> (-z,x)
+                        return [-z, y, x];
                     }
                 case 'z':
-                    // Z축 회전 (X-Y 평면에서 회전)
+                    // Z축 회전 (X-Y 평면에서 90도 회전)
                     if (reverse) {
-                        return [-y, x, z];
-                    } else {
+                        // Z축 반시계방향 90도: (x,y) -> (y,-x)
                         return [y, -x, z];
+                    } else {
+                        // Z축 시계방향 90도: (x,y) -> (-y,x)
+                        return [-y, x, z];
                     }
                 default:
                     return [x, y, z];
