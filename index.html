@@ -609,7 +609,8 @@
             padding: 20px;
             margin: 12px 0;
             border-radius: 15px;
-            cursor: pointer;
+            cursor: pointer !important;
+            pointer-events: auto !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -621,6 +622,10 @@
             width: 100%;
             max-width: 500px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .mode-btn::before {
@@ -640,14 +645,26 @@
         }
 
         .mode-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.02);
             border-color: rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .mode-btn:active {
-            transform: translateY(-1px);
+            transform: translateY(-1px) scale(0.98);
             transition: all 0.1s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .mode-btn:hover .mode-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .mode-btn:hover .mode-title {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         .mode-icon {
@@ -691,12 +708,19 @@
         }
 
         .mode-40:hover {
-            border-color: rgba(255, 140, 0, 0.6);
-            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.2);
+            border-color: rgba(255, 140, 0, 0.8);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.3);
+            background: rgba(255, 140, 0, 0.1);
+        }
+
+        .mode-40:hover .mode-icon {
+            background: linear-gradient(135deg, #ff9500, #ff7b45);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
         }
 
         .mode-40 .mode-icon {
             background: linear-gradient(135deg, #ff8c00, #ff6b35);
+            transition: all 0.3s ease;
         }
 
         .mode-blitz {
@@ -704,12 +728,19 @@
         }
 
         .mode-blitz:hover {
-            border-color: rgba(255, 69, 0, 0.6);
-            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.2);
+            border-color: rgba(255, 69, 0, 0.8);
+            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.3);
+            background: rgba(255, 69, 0, 0.1);
+        }
+
+        .mode-blitz:hover .mode-icon {
+            background: linear-gradient(135deg, #ff5500, #e2144c);
+            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.4);
         }
 
         .mode-blitz .mode-icon {
             background: linear-gradient(135deg, #ff4500, #dc143c);
+            transition: all 0.3s ease;
         }
 
         .mode-zen {
@@ -717,12 +748,19 @@
         }
 
         .mode-zen:hover {
-            border-color: rgba(138, 43, 226, 0.6);
-            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.2);
+            border-color: rgba(138, 43, 226, 0.8);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.3);
+            background: rgba(138, 43, 226, 0.1);
+        }
+
+        .mode-zen:hover .mode-icon {
+            background: linear-gradient(135deg, #9a3be2, #a932dc);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
         }
 
         .mode-zen .mode-icon {
             background: linear-gradient(135deg, #8a2be2, #9932cc);
+            transition: all 0.3s ease;
         }
 
 
@@ -1959,53 +1997,67 @@
             showMobileControlsIfNeeded();
             
             // 모드 버튼 이벤트 리스너 추가
-            const modeButtons = document.querySelectorAll('.mode-btn[data-mode]');
-            console.log('발견된 모드 버튼 개수:', modeButtons.length);
-            
-            modeButtons.forEach((button, index) => {
-                console.log(`버튼 ${index + 1} 설정 중:`, button.getAttribute('data-mode'));
+            setTimeout(() => {
+                const modeButtons = document.querySelectorAll('.mode-btn[data-mode]');
+                console.log('발견된 모드 버튼 개수:', modeButtons.length);
                 
-                // 클릭 이벤트
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                modeButtons.forEach((button, index) => {
                     const mode = button.getAttribute('data-mode');
-                    console.log(`🔥 ${mode} 모드 버튼 클릭됨!`);
-                    startGameMode(mode);
+                    console.log(`버튼 ${index + 1} 설정 중:`, mode);
+                    
+                    // 클릭 이벤트 (메인)
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`🔥 ${mode} 모드 버튼 클릭됨!`);
+                        startGameMode(mode);
+                    });
+                    
+                    // 마우스 다운 이벤트 (백업)
+                    button.addEventListener('mousedown', function(e) {
+                        console.log(`마우스 다운: ${mode}`);
+                    });
+                    
+                    // 터치 이벤트 (모바일)
+                    button.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        console.log(`📱 ${mode} 모드 버튼 터치됨!`);
+                        startGameMode(mode);
+                    }, { passive: false });
+                    
+                    // 포인터 이벤트 (모든 디바이스)
+                    button.addEventListener('pointerdown', function(e) {
+                        console.log(`포인터 다운: ${mode}`);
+                    });
                 });
                 
-                // 마우스 다운 이벤트 (추가 안전장치)
-                button.addEventListener('mousedown', (e) => {
-                    console.log('버튼 마우스 다운 감지:', button.getAttribute('data-mode'));
-                });
-                
-                // 터치 이벤트 (모바일용)
-                button.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    const mode = button.getAttribute('data-mode');
-                    console.log(`📱 ${mode} 모드 버튼 터치됨!`);
-                    startGameMode(mode);
-                });
-            });
-            
-            // 랭킹 버튼 이벤트 리스너 추가
-            const rankingBtn = document.getElementById('rankingBtn');
-            if (rankingBtn) {
-                console.log('랭킹 버튼 발견됨');
-                rankingBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🏆 랭킹 버튼 클릭됨');
-                    showRanking();
-                });
-            } else {
-                console.error('랭킹 버튼을 찾을 수 없습니다!');
-            }
+                // 랭킹 버튼 이벤트 리스너 추가
+                const rankingBtn = document.getElementById('rankingBtn');
+                if (rankingBtn) {
+                    console.log('랭킹 버튼 발견됨');
+                    rankingBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🏆 랭킹 버튼 클릭됨');
+                        showRanking();
+                    });
+                } else {
+                    console.error('랭킹 버튼을 찾을 수 없습니다!');
+                }
+            }, 100); // DOM이 완전히 로드된 후 실행
         });
 
         // 창 크기 변경 시 모바일 감지
         window.addEventListener('resize', () => {
             showMobileControlsIfNeeded();
+        });
+
+        // 전역 클릭 이벤트 디버깅
+        document.addEventListener('click', (e) => {
+            console.log('전역 클릭 감지:', e.target);
+            if (e.target.closest('.mode-btn')) {
+                console.log('모드 버튼 클릭 감지됨!');
+            }
         });
 
         // 게임 모드 시작 함수
