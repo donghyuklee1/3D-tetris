@@ -1385,8 +1385,20 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase 설정 (임시 비활성화 - 로컬 랭킹 사용)
-        const firebaseConfig = null;
+        // Firebase 설정 (실제 프로젝트 생성 후 아래 정보를 실제 값으로 교체하세요)
+        const firebaseConfig = null; // 임시 비활성화
+        
+        // 실제 Firebase 프로젝트 생성 후 아래 주석을 해제하고 실제 값으로 교체하세요:
+        /*
+        const firebaseConfig = {
+            apiKey: "실제_API_키_여기에_입력",
+            authDomain: "실제_프로젝트_ID.firebaseapp.com",
+            projectId: "실제_프로젝트_ID",
+            storageBucket: "실제_프로젝트_ID.appspot.com",
+            messagingSenderId: "실제_송신자_ID",
+            appId: "실제_앱_ID"
+        };
+        */
 
         // Firebase 초기화
         if (firebaseConfig) {
