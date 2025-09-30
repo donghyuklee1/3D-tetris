@@ -1210,9 +1210,9 @@ class Tetris3D {
                     timestamp: data.timestamp
                 });
             });
-            console.log('Firebase에서 랭킹 로드 완료:', this.ranking);
+            // Firebase에서 랭킹 로드 완료
         } catch (error) {
-            console.error('Firebase 랭킹 로드 실패, 로컬 스토리지 사용:', error);
+            // Firebase 랭킹 로드 실패, 로컬 스토리지 사용
             this.loadRankingFromLocal();
         }
     }
@@ -1239,7 +1239,7 @@ class Tetris3D {
         if (this.currentUser && window.firebaseDb) {
             await this.saveScoreToFirebase(score);
         } else {
-            // 로컬 스토리지에 저장
+            // 로컬 스토리지에 저장 (Firebase 없이도 작동)
             this.saveScoreToLocal(score);
         }
         this.updateRankingUI();
@@ -1313,17 +1313,38 @@ class Tetris3D {
         if (this.isAnonymousMode) {
             // 익명 모드에서는 자동으로 이름 설정
             playerName = '익명 사용자';
+        } else if (this.currentUser) {
+            // 현재 사용자가 있으면 닉네임 사용
+            playerName = this.currentUser.nickname || this.currentUser.displayName || '익명 사용자';
         } else {
             // 일반 모드에서는 사용자 입력 요청
             playerName = prompt('플레이어 이름을 입력하세요:', '플레이어');
         }
         
         if (playerName) {
-            this.ranking.push({
-                name: playerName,
-                score: score,
-                date: new Date().toISOString()
-            });
+            // 기존 사용자 기록이 있는지 확인
+            const existingIndex = this.ranking.findIndex(entry => entry.name === playerName);
+            
+            if (existingIndex !== -1) {
+                // 기존 사용자의 점수가 더 높으면 업데이트
+                if (score > this.ranking[existingIndex].score) {
+                    this.ranking[existingIndex].score = score;
+                    this.ranking[existingIndex].date = new Date().toISOString();
+                    console.log(`${playerName}의 최고 점수 업데이트: ${score}`);
+                } else {
+                    console.log(`${playerName}의 기존 점수가 더 높음: ${this.ranking[existingIndex].score}`);
+                    this.saveRanking();
+                    return;
+                }
+            } else {
+                // 새로운 사용자 추가
+                this.ranking.push({
+                    name: playerName,
+                    score: score,
+                    date: new Date().toISOString()
+                });
+                console.log(`새로운 플레이어 ${playerName} 추가: ${score}점`);
+            }
             
             // 점수순으로 정렬 (내림차순)
             this.ranking.sort((a, b) => b.score - a.score);
@@ -1332,7 +1353,6 @@ class Tetris3D {
             this.ranking = this.ranking.slice(0, 10);
             
             this.saveRanking();
-            console.log('로컬 랭킹에 저장됨:', playerName, score);
         }
     }
     

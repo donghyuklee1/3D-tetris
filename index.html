@@ -1236,8 +1236,8 @@
             <div class="logo">3D TETRIS</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
-                <button class="start-btn" onclick="startAnonymousGame()">익명으로 게임하기</button>
-                <button class="start-btn secondary" onclick="showRanking()">🏆 랭킹</button>
+                <button class="start-btn" onclick="startAnonymousGame()">익명으로 진행하기</button>
+                <button class="start-btn secondary" onclick="showRanking()">Ranking 🏆</button>
             </div>
             
             <!-- 로그인 섹션 -->
@@ -1347,7 +1347,7 @@
             <div class="ranking-modal-content">
                 <div class="ranking-header">
                     <h2 class="ranking-title">🏆 LEADERBOARD</h2>
-                    <div class="ranking-subtitle">전 세계 최고 점수 순위</div>
+                    <div class="ranking-subtitle">기록 순위</div>
                 </div>
                 
                 <div class="ranking-stats">
@@ -1385,10 +1385,10 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase 설정 (로컬 개발용 - Firebase 비활성화)
-        const firebaseConfig = null; // Firebase 비활성화
+        // Firebase 설정 (임시 비활성화 - 로컬 랭킹 사용)
+        const firebaseConfig = null;
 
-        // Firebase 초기화 (로컬 개발용 - Firebase 비활성화)
+        // Firebase 초기화
         if (firebaseConfig) {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -1411,7 +1411,7 @@
 
                 console.log('Firebase 초기화 완료');
             } catch (error) {
-                console.warn('Firebase 초기화 실패 - 로컬 모드로 실행됩니다:', error);
+                // Firebase 초기화 실패 - 로컬 모드로 실행
                 // Firebase 초기화 실패 시 null로 설정
                 window.firebaseAuth = null;
                 window.firebaseDb = null;
@@ -1779,7 +1779,7 @@
                     }
                 });
             } else {
-                console.warn('Firebase 인증 모듈이 로드되지 않았습니다. 로컬 모드로 실행됩니다.');
+                // Firebase가 비활성화된 상태 - 로컬 모드로 실행
             }
         }
 
