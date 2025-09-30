@@ -453,6 +453,12 @@ class Tetris3D {
                     case 'ArrowDown': // X-Z 평면 아래쪽 90도 회전
                         this.rotatePiece('y', true); // Y축 반시계방향
                         break;
+                    case 'KeyQ': // X축 회전 (뒤집기)
+                        this.rotatePiece('x', false); // X축 시계방향
+                        break;
+                    case 'KeyE': // X축 반대 회전 (뒤집기)
+                        this.rotatePiece('x', true); // X축 반시계방향
+                        break;
                     case 'Space': // 빠른 낙하
                         event.preventDefault();
                         this.dropPiece();
@@ -542,8 +548,8 @@ class Tetris3D {
             const tapLength = currentTime - lastTapTime;
             
             if (tapLength < 500 && tapLength > 0) {
-                // 더블 탭 - 빠른 낙하
-                this.dropPiece();
+                // 더블 탭 - X축 회전 (뒤집기)
+                this.rotatePiece('x', false); // X축 시계방향
             }
             
             lastTapTime = currentTime;
