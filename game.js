@@ -354,7 +354,8 @@ class Tetris3D {
                 }
             }
             
-            // 현재 블록 생성 (메인 게임과 정확히 동일한 조건)
+            // 현재 블록은 미니맵에서 생성하지 않음 - 메인 게임과의 동기화 문제 방지
+            /*
             if (this.currentPiece && this.currentPiece.blocks && this.currentPiece.type && this.gameRunning && !this.gamePaused) {
                 this.currentPiece.blocks.forEach(block => {
                     const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
@@ -410,6 +411,7 @@ class Tetris3D {
                     }
                 }
             }
+            */
             
             // 미니맵 렌더링
             this.miniRenderer.render(this.miniScene, this.miniCamera);
