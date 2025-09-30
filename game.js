@@ -1,9 +1,24 @@
 class Tetris3D {
     constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+        try {
+            console.log('Tetris3D 생성자 시작');
+            
+            // Canvas 요소 확인
+            this.canvas = document.getElementById('gameCanvas');
+            if (!this.canvas) {
+                throw new Error('Canvas 요소를 찾을 수 없습니다!');
+            }
+            console.log('Canvas 요소 확인됨:', this.canvas);
+            
+            // Three.js 기본 설정
+            this.scene = new THREE.Scene();
+            console.log('Scene 생성됨');
+            
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            console.log('Camera 생성됨');
+            
+            this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+            console.log('Renderer 생성됨');
         
         // 게임 설정
         this.BOARD_WIDTH = 4;
@@ -27,6 +42,7 @@ class Tetris3D {
         this.ranking = [];
         this.currentUser = null;
         this.userBestScore = 0;
+        console.log('랭킹 시스템 초기화');
         this.loadRanking();
         
         // 미니맵 업데이트 플래그
@@ -126,9 +142,16 @@ class Tetris3D {
         ];
         
         try {
+            console.log('게임 초기화 시작');
             this.initializeGame();
+            console.log('게임 초기화 완료');
+            this.setupEventListeners();
+            console.log('이벤트 리스너 설정 완료');
+            this.gameLoop();
+            console.log('게임 루프 시작');
         } catch (error) {
             console.error('게임 초기화 중 오류:', error);
+            console.error('오류 스택:', error.stack);
             throw error;
         }
     }
