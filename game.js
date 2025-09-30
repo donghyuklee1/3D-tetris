@@ -642,12 +642,18 @@ class Tetris3D {
     }
     
     createPieceVisual() {
-        // 기존 피스 시각화 제거
+        // 기존 피스 시각화 완전 제거
         this.pieceGroup.clear();
         this.shadowGroup.clear();
         
+        // 현재 피스가 존재하는지 확인
+        if (!this.currentPiece || !this.currentPiece.blocks) {
+            console.log('현재 피스가 없습니다');
+            return;
+        }
+        
         // 현재 피스의 블록들 생성
-        this.currentPiece.blocks.forEach(block => {
+        this.currentPiece.blocks.forEach((block, index) => {
             const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
             const material = new THREE.MeshPhysicalMaterial({
                 color: this.currentPiece.type.color,
@@ -671,7 +677,7 @@ class Tetris3D {
             const gridZ = Math.round(this.currentPiece.position.z + block[2]);
             
             cube.position.set(gridX, gridY, gridZ);
-            
+            cube.userData = { blockIndex: index }; // 디버깅용
             this.pieceGroup.add(cube);
         });
         
@@ -822,18 +828,26 @@ class Tetris3D {
     
     placePiece() {
         // 현재 피스를 보드에 고정
-        this.currentPiece.blocks.forEach(block => {
-            const x = Math.round(this.currentPiece.position.x + block[0]);
-            const y = Math.round(this.currentPiece.position.y - block[1]);
-            const z = Math.round(this.currentPiece.position.z + block[2]);
+        if (this.currentPiece && this.currentPiece.blocks) {
+            this.currentPiece.blocks.forEach(block => {
+                const x = Math.round(this.currentPiece.position.x + block[0]);
+                const y = Math.round(this.currentPiece.position.y - block[1]);
+                const z = Math.round(this.currentPiece.position.z + block[2]);
+                
+                if (y >= 0 && y < this.BOARD_HEIGHT && 
+                    x >= 0 && x < this.BOARD_WIDTH && 
+                    z >= 0 && z < this.BOARD_DEPTH) {
+                    this.board[y][z][x] = 1;
+                    this.boardColors[y][z][x] = this.currentPiece.type.color; // 색상 저장
+                }
+            });
             
-            if (y >= 0 && y < this.BOARD_HEIGHT && 
-                x >= 0 && x < this.BOARD_WIDTH && 
-                z >= 0 && z < this.BOARD_DEPTH) {
-                this.board[y][z][x] = 1;
-                this.boardColors[y][z][x] = this.currentPiece.type.color; // 색상 저장
-            }
-        });
+            // 블록 배치 효과 추가
+            this.addPlacementEffect();
+            
+            // 점수 추가 (Tetrio 방식)
+            this.addScore(10); // 블록 하나당 10점
+        }
         
         // 완성된 레이어 체크 및 제거
         this.checkAndClearLayers();
@@ -876,7 +890,12 @@ class Tetris3D {
         }
         
         if (layersCleared > 0) {
-            this.score += layersCleared * 100 * this.level;
+            // 레이어 제거 효과
+            this.addLayerClearEffect();
+            
+            // Tetrio 방식 점수 계산
+            const baseScore = [0, 100, 300, 500, 800][layersCleared] || 800;
+            this.addScore(baseScore * this.level);
             this.level = Math.floor(this.score / 1000) + 1;
             this.dropInterval = Math.max(100, 1000 - (this.level - 1) * 100);
             this.updateUI();
@@ -942,6 +961,200 @@ class Tetris3D {
     updateUI() {
         document.getElementById('score').textContent = `점수: ${this.score}`;
         document.getElementById('level').textContent = `레벨: ${this.level}`;
+    }
+
+    addScore(points) {
+        this.score += points;
+        this.updateUI();
+    }
+
+    addPlacementEffect() {
+        // 화면 흔들림 효과
+        this.addScreenShake();
+        
+        // 파티클 효과
+        this.addParticleEffect();
+    }
+
+    addScreenShake() {
+        const originalPosition = this.camera.position.clone();
+        const shakeIntensity = 0.1;
+        const shakeDuration = 200; // 200ms
+        
+        let shakeTime = 0;
+        const shakeInterval = setInterval(() => {
+            shakeTime += 16; // 60fps
+            
+            const randomX = (Math.random() - 0.5) * shakeIntensity;
+            const randomY = (Math.random() - 0.5) * shakeIntensity;
+            const randomZ = (Math.random() - 0.5) * shakeIntensity;
+            
+            this.camera.position.set(
+                originalPosition.x + randomX,
+                originalPosition.y + randomY,
+                originalPosition.z + randomZ
+            );
+            
+            if (shakeTime >= shakeDuration) {
+                clearInterval(shakeInterval);
+                this.camera.position.copy(originalPosition);
+            }
+        }, 16);
+    }
+
+    addParticleEffect() {
+        // 현재 피스 위치에서 파티클 생성
+        if (!this.currentPiece) return;
+        
+        const particleCount = 20;
+        const particles = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const geometry = new THREE.SphereGeometry(0.05, 8, 6);
+            const material = new THREE.MeshBasicMaterial({
+                color: this.currentPiece.type.color,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particle = new THREE.Mesh(geometry, material);
+            
+            // 현재 피스 중앙에서 파티클 시작
+            const centerX = this.currentPiece.position.x + 1.5;
+            const centerY = this.currentPiece.position.y;
+            const centerZ = this.currentPiece.position.z + 1.5;
+            
+            particle.position.set(centerX, centerY, centerZ);
+            
+            // 랜덤 방향으로 파티클 이동
+            particle.userData = {
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.2,
+                    Math.random() * 0.3 + 0.1,
+                    (Math.random() - 0.5) * 0.2
+                ),
+                life: 1.0
+            };
+            
+            this.scene.add(particle);
+            particles.push(particle);
+        }
+        
+        // 파티클 애니메이션
+        let animationTime = 0;
+        const animationDuration = 1000; // 1초
+        
+        const animateParticles = () => {
+            animationTime += 16;
+            
+            particles.forEach((particle, index) => {
+                if (particle.userData.life <= 0) return;
+                
+                // 파티클 이동
+                particle.position.add(particle.userData.velocity);
+                particle.userData.velocity.y -= 0.01; // 중력
+                
+                // 투명도 감소
+                particle.userData.life -= 0.02;
+                particle.material.opacity = particle.userData.life;
+                
+                // 파티클 제거
+                if (particle.userData.life <= 0) {
+                    this.scene.remove(particle);
+                    particles.splice(index, 1);
+                }
+            });
+            
+            if (animationTime < animationDuration && particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            } else {
+                // 남은 파티클들 정리
+                particles.forEach(particle => {
+                    this.scene.remove(particle);
+                });
+            }
+        };
+        
+        animateParticles();
+    }
+
+    addLayerClearEffect() {
+        // 레이어 클리어 시 더 강한 화면 흔들림
+        this.addScreenShake();
+        
+        // 레이어 클리어 파티클 (더 많은 파티클)
+        this.addLayerClearParticles();
+    }
+
+    addLayerClearParticles() {
+        const particleCount = 50;
+        const particles = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const geometry = new THREE.SphereGeometry(0.08, 8, 6);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffff00, // 노란색
+                transparent: true,
+                opacity: 0.9
+            });
+            const particle = new THREE.Mesh(geometry, material);
+            
+            // 보드 중앙에서 파티클 시작
+            particle.position.set(
+                1.5 + (Math.random() - 0.5) * 3,
+                6 + Math.random() * 6,
+                1.5 + (Math.random() - 0.5) * 3
+            );
+            
+            // 더 강한 파티클 효과
+            particle.userData = {
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.5,
+                    Math.random() * 0.8 + 0.3,
+                    (Math.random() - 0.5) * 0.5
+                ),
+                life: 1.0
+            };
+            
+            this.scene.add(particle);
+            particles.push(particle);
+        }
+        
+        // 파티클 애니메이션
+        let animationTime = 0;
+        const animationDuration = 1500; // 1.5초
+        
+        const animateParticles = () => {
+            animationTime += 16;
+            
+            particles.forEach((particle, index) => {
+                if (particle.userData.life <= 0) return;
+                
+                // 파티클 이동
+                particle.position.add(particle.userData.velocity);
+                particle.userData.velocity.y -= 0.008; // 중력
+                
+                // 투명도 감소
+                particle.userData.life -= 0.015;
+                particle.material.opacity = particle.userData.life;
+                
+                // 파티클 제거
+                if (particle.userData.life <= 0) {
+                    this.scene.remove(particle);
+                    particles.splice(index, 1);
+                }
+            });
+            
+            if (animationTime < animationDuration && particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            } else {
+                // 남은 파티클들 정리
+                particles.forEach(particle => {
+                    this.scene.remove(particle);
+                });
+            }
+        };
+        
+        animateParticles();
     }
     
     togglePause() {
