@@ -341,7 +341,6 @@ class Tetris3D {
                                 clearcoat: 0.6,
                                 clearcoatRoughness: 0.2,
                                 transmission: 0.2,
-                                thickness: 0.3,
                                 envMapIntensity: 0.8
                             });
                             const cube = new THREE.Mesh(geometry, material);
@@ -368,7 +367,6 @@ class Tetris3D {
                         clearcoat: 0.8,
                         clearcoatRoughness: 0.1,
                         transmission: 0.3,
-                        thickness: 0.5,
                         envMapIntensity: 1.0
                     });
                     const cube = new THREE.Mesh(geometry, material);
@@ -664,7 +662,6 @@ class Tetris3D {
                 clearcoat: 0.8,
                 clearcoatRoughness: 0.1,
                 transmission: 0.3,
-                thickness: 0.5,
                 envMapIntensity: 1.0
             });
             const cube = new THREE.Mesh(geometry, material);
@@ -805,13 +802,11 @@ class Tetris3D {
             if (x < 0 || x >= this.BOARD_WIDTH || 
                 y < 0 || y >= this.BOARD_HEIGHT || 
                 z < 0 || z >= this.BOARD_DEPTH) {
-                console.log(`충돌: 경계 밖 (${x}, ${y}, ${z}) - 보드 크기: ${this.BOARD_WIDTH}x${this.BOARD_HEIGHT}x${this.BOARD_DEPTH}`);
                 return true;
             }
             
             // 다른 블록과 충돌 체크
             if (this.board[y][z][x] === 1) {
-                console.log(`충돌: 기존 블록과 충돌 (${x}, ${y}, ${z})`);
                 return true;
             }
         }
@@ -829,24 +824,32 @@ class Tetris3D {
     placePiece() {
         // 현재 피스를 보드에 고정
         if (this.currentPiece && this.currentPiece.blocks) {
+            let placedBlocks = 0;
+            
             this.currentPiece.blocks.forEach((block, index) => {
                 const x = Math.round(this.currentPiece.position.x + block[0]);
                 const y = Math.round(this.currentPiece.position.y - block[1]);
                 const z = Math.round(this.currentPiece.position.z + block[2]);
                 
+                // 중복 배치 방지: 이미 블록이 있는 위치에는 배치하지 않음
                 if (y >= 0 && y < this.BOARD_HEIGHT && 
                     x >= 0 && x < this.BOARD_WIDTH && 
-                    z >= 0 && z < this.BOARD_DEPTH) {
+                    z >= 0 && z < this.BOARD_DEPTH &&
+                    this.board[y][z][x] === 0) { // 빈 공간에만 배치
                     this.board[y][z][x] = 1;
                     this.boardColors[y][z][x] = this.currentPiece.type.color; // 색상 저장
+                    placedBlocks++;
                 }
             });
             
-            // 블록 배치 효과 추가
-            this.addPlacementEffect();
-            
-            // 점수 추가 (Tetrio 방식) - 배치된 블록 개수만큼
-            this.addScore(this.currentPiece.blocks.length * 10); // 블록 하나당 10점
+            // 실제로 배치된 블록이 있을 때만 효과와 점수 추가
+            if (placedBlocks > 0) {
+                // 블록 배치 효과 추가
+                this.addPlacementEffect();
+                
+                // 점수 추가 (Tetrio 방식) - 실제 배치된 블록 개수만큼
+                this.addScore(placedBlocks * 10); // 블록 하나당 10점
+            }
         }
         
         // 현재 피스 그룹 완전히 정리 (먼저 정리)
@@ -944,7 +947,6 @@ class Tetris3D {
                             clearcoat: 0.6,
                             clearcoatRoughness: 0.2,
                             transmission: 0.2,
-                            thickness: 0.3,
                             envMapIntensity: 0.8
                         });
                         const cube = new THREE.Mesh(geometry, material);
