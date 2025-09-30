@@ -1996,55 +1996,18 @@
             // 모바일 컨트롤 가이드 표시
             showMobileControlsIfNeeded();
             
-            // 모드 버튼 이벤트 리스너 추가
+            // 버튼 확인 로그
             setTimeout(() => {
                 const modeButtons = document.querySelectorAll('.mode-btn[data-mode]');
+                const rankingBtn = document.getElementById('rankingBtn');
                 console.log('발견된 모드 버튼 개수:', modeButtons.length);
+                console.log('랭킹 버튼 발견:', !!rankingBtn);
                 
                 modeButtons.forEach((button, index) => {
                     const mode = button.getAttribute('data-mode');
-                    console.log(`버튼 ${index + 1} 설정 중:`, mode);
-                    
-                    // 클릭 이벤트 (메인)
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`🔥 ${mode} 모드 버튼 클릭됨!`);
-                        startGameMode(mode);
-                    });
-                    
-                    // 마우스 다운 이벤트 (백업)
-                    button.addEventListener('mousedown', function(e) {
-                        console.log(`마우스 다운: ${mode}`);
-                    });
-                    
-                    // 터치 이벤트 (모바일)
-                    button.addEventListener('touchstart', function(e) {
-                        e.preventDefault();
-                        console.log(`📱 ${mode} 모드 버튼 터치됨!`);
-                        startGameMode(mode);
-                    }, { passive: false });
-                    
-                    // 포인터 이벤트 (모든 디바이스)
-                    button.addEventListener('pointerdown', function(e) {
-                        console.log(`포인터 다운: ${mode}`);
-                    });
+                    console.log(`버튼 ${index + 1}: ${mode}`);
                 });
-                
-                // 랭킹 버튼 이벤트 리스너 추가
-                const rankingBtn = document.getElementById('rankingBtn');
-                if (rankingBtn) {
-                    console.log('랭킹 버튼 발견됨');
-                    rankingBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('🏆 랭킹 버튼 클릭됨');
-                        showRanking();
-                    });
-                } else {
-                    console.error('랭킹 버튼을 찾을 수 없습니다!');
-                }
-            }, 100); // DOM이 완전히 로드된 후 실행
+            }, 100);
         });
 
         // 창 크기 변경 시 모바일 감지
@@ -2052,11 +2015,60 @@
             showMobileControlsIfNeeded();
         });
 
-        // 전역 클릭 이벤트 디버깅
+        // 전역 클릭 이벤트로 모드 버튼 처리
         document.addEventListener('click', (e) => {
-            console.log('전역 클릭 감지:', e.target);
-            if (e.target.closest('.mode-btn')) {
-                console.log('모드 버튼 클릭 감지됨!');
+            const modeBtn = e.target.closest('.mode-btn[data-mode]');
+            if (modeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const mode = modeBtn.getAttribute('data-mode');
+                console.log(`🔥 전역 클릭으로 ${mode} 모드 시작!`);
+                startGameMode(mode);
+                return;
+            }
+            
+            const rankingBtn = e.target.closest('#rankingBtn');
+            if (rankingBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🏆 전역 클릭으로 랭킹 열기!');
+                showRanking();
+                return;
+            }
+        });
+
+        // 마우스 업 이벤트 추가 (PC용)
+        document.addEventListener('mouseup', (e) => {
+            const modeBtn = e.target.closest('.mode-btn[data-mode]');
+            if (modeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const mode = modeBtn.getAttribute('data-mode');
+                console.log(`🖱️ 마우스 업으로 ${mode} 모드 시작!`);
+                startGameMode(mode);
+                return;
+            }
+        });
+
+        // 터치 이벤트 (모바일용)
+        document.addEventListener('touchend', (e) => {
+            const modeBtn = e.target.closest('.mode-btn[data-mode]');
+            if (modeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const mode = modeBtn.getAttribute('data-mode');
+                console.log(`📱 터치로 ${mode} 모드 시작!`);
+                startGameMode(mode);
+                return;
+            }
+            
+            const rankingBtn = e.target.closest('#rankingBtn');
+            if (rankingBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📱 터치로 랭킹 열기!');
+                showRanking();
+                return;
             }
         });
 
