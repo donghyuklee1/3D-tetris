@@ -441,16 +441,16 @@ class Tetris3D {
                     case 'KeyS': // 뒤쪽 이동
                         this.movePiece(0, 0, 1);
                         break;
-                    case 'ArrowLeft': // Y축 반시계방향 회전 (좌우 회전)
-                        this.rotatePiece('y', true);
+                    case 'ArrowLeft': // Z축 반시계방향 회전 (X축 중심 회전)
+                        this.rotatePiece('z', true);
                         break;
-                    case 'ArrowRight': // Y축 시계방향 회전 (좌우 회전)
-                        this.rotatePiece('y', false);
+                    case 'ArrowRight': // Z축 시계방향 회전 (X축 중심 회전)
+                        this.rotatePiece('z', false);
                         break;
-                    case 'ArrowUp': // X축 시계방향 회전 (앞뒤 회전)
+                    case 'ArrowUp': // X축 시계방향 회전 (Z축 중심 회전)
                         this.rotatePiece('x', false);
                         break;
-                    case 'ArrowDown': // X축 반시계방향 회전 (앞뒤 회전)
+                    case 'ArrowDown': // X축 반시계방향 회전 (Z축 중심 회전)
                         this.rotatePiece('x', true);
                         break;
                     case 'Space': // 빠른 낙하
@@ -512,14 +512,14 @@ class Tetris3D {
             // 스와이프 감지 (최소 50px 이동)
                 if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        // 가로 스와이프 - Y축 회전 (좌우 회전)
+                        // 가로 스와이프 - Z축 회전 (X축 중심 회전)
                         if (deltaX > 0) {
-                            this.rotatePiece('y', false); // 오른쪽 스와이프 - Y축 시계방향
+                            this.rotatePiece('z', false); // 오른쪽 스와이프 - Z축 시계방향
                         } else {
-                            this.rotatePiece('y', true); // 왼쪽 스와이프 - Y축 반시계방향
+                            this.rotatePiece('z', true); // 왼쪽 스와이프 - Z축 반시계방향
                         }
                     } else {
-                        // 세로 스와이프 - X축 회전 (앞뒤 회전)
+                        // 세로 스와이프 - X축 회전 (Z축 중심 회전)
                         if (deltaY > 0) {
                             this.rotatePiece('x', true); // 아래쪽 스와이프 - X축 반시계방향
                         } else {
@@ -527,8 +527,8 @@ class Tetris3D {
                         }
                     }
             } else if (deltaTime < 200) {
-                // 짧은 터치 (탭) - Y축 회전 (좌우 회전)
-                this.rotatePiece('y', false); // 시계방향 회전
+                // 짧은 터치 (탭) - Z축 회전 (X축 중심 회전)
+                this.rotatePiece('z', false); // 시계방향 회전
             } else {
                 // 긴 터치 - 빠른 낙하
                 this.dropPiece();
@@ -542,7 +542,7 @@ class Tetris3D {
             const tapLength = currentTime - lastTapTime;
             
             if (tapLength < 500 && tapLength > 0) {
-                // 더블 탭 - X축 회전 (앞뒤 회전)
+                // 더블 탭 - X축 회전 (Z축 중심 회전)
                 this.rotatePiece('x', false); // X축 시계방향
             }
             
@@ -798,20 +798,20 @@ class Tetris3D {
             
             switch (axis) {
                 case 'x':
-                    // X축 회전: 앞뒤 회전 (Y-Z 평면에서 90도 회전)
-                    // 블록을 앞뒤로 뒤집어서 밑면과 평행하게 만들 수 있음
+                    // X축 회전: Z축을 중심으로 회전 (밑면에서 보는 시점)
+                    // X축을 중심으로 90도 회전
                     if (reverse) {
-                        return [x, z, -y]; // 반시계방향 90도
+                        return [x, -z, y]; // 반시계방향 90도
                     } else {
-                        return [x, -z, y]; // 시계방향 90도
+                        return [x, z, -y]; // 시계방향 90도
                     }
-                case 'y':
-                    // Y축 회전: 좌우 회전 (X-Z 평면에서 90도 회전)
-                    // 블록을 좌우로 회전하여 다양한 방향으로 배치 가능
+                case 'z':
+                    // Z축 회전: X축을 중심으로 회전 (측면에서 보는 시점)
+                    // Z축을 중심으로 90도 회전
                     if (reverse) {
-                        return [-z, y, x]; // 반시계방향 90도
+                        return [y, -x, z]; // 반시계방향 90도
                     } else {
-                        return [z, y, -x]; // 시계방향 90도
+                        return [-y, x, z]; // 시계방향 90도
                     }
                 default:
                     return [x, y, z];
