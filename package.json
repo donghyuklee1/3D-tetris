@@ -6,7 +6,9 @@
   "scripts": {
     "start": "python -m http.server 8000",
     "serve": "npx http-server -p 8000 -c-1",
-    "dev": "npx live-server --port=8000 --open=/index.html"
+    "dev": "npx live-server --port=8000 --open=/index.html",
+    "build": "echo 'No build step required for static files'",
+    "vercel-build": "echo 'Vercel build completed'"
   },
   "keywords": [
     "tetris",

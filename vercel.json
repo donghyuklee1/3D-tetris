@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "3d-tetris",
   "builds": [
     {
       "src": "**/*",
@@ -19,24 +18,11 @@
   ],
   "headers": [
     {
-      "source": "/game.js",
+      "source": "/(.*\\.js)",
       "headers": [
         {
           "key": "Content-Type",
           "value": "application/javascript"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     }
