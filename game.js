@@ -817,7 +817,7 @@ class Tetris3D {
         while (this.movePiece(0, -1, 0)) {
             // 계속 떨어뜨림
         }
-        this.placePiece();
+        // placePiece() 호출하지 않음 - 게임 루프에서 자동으로 처리됨
         this.minimapNeedsUpdate = true; // 블록 드롭 시 미니맵 업데이트
     }
     
