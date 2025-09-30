@@ -814,12 +814,10 @@ class Tetris3D {
     }
     
     dropPiece() {
-        // 블록을 최대한 아래로 내림
         while (this.movePiece(0, -1, 0)) {
             // 계속 떨어뜨림
         }
-        // 즉시 블록 설치 (게임 루프 대기하지 않음)
-        this.placePiece();
+        // placePiece() 호출하지 않음 - 게임 루프에서 자동으로 처리됨
         this.minimapNeedsUpdate = true; // 블록 드롭 시 미니맵 업데이트
     }
     
