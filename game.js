@@ -798,12 +798,12 @@ class Tetris3D {
             
             switch (axis) {
                 case 'x':
-                    // X축 회전: Z축을 중심으로 회전 (밑면에서 보는 시점)
+                    // X축 회전: Y-Z 평면에서 회전 (수직 블록을 수평으로)
                     // X축을 중심으로 90도 회전
                     if (reverse) {
-                        return [x, -z, y]; // 반시계방향 90도
+                        return [x, z, -y]; // 반시계방향 90도
                     } else {
-                        return [x, z, -y]; // 시계방향 90도
+                        return [x, -z, y]; // 시계방향 90도
                     }
                 case 'z':
                     // Z축 회전: X축을 중심으로 회전 (측면에서 보는 시점)
