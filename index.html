@@ -45,7 +45,7 @@
                     transparent 98px,
                     rgba(255, 255, 255, 0.02) 100px
                 );
-            animation: subtleScanlines 8s linear infinite;
+            animation: subtleScanlines 4s linear infinite;
             pointer-events: none;
             z-index: 1;
         }
@@ -109,7 +109,7 @@
                     transparent 98px,
                     rgba(0, 255, 255, 0.03) 100px
                 );
-            animation: retroScan 4s linear infinite;
+            animation: retroScan 2s linear infinite;
             opacity: 0.8;
             z-index: 1;
         }
@@ -127,7 +127,7 @@
                 radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.05) 0%, transparent 70%);
             pointer-events: none;
             z-index: 1;
-            animation: retroGlow 6s ease-in-out infinite alternate;
+            animation: retroGlow 3s ease-in-out infinite alternate;
         }
 
         @keyframes retroScan {
@@ -170,7 +170,7 @@
                 linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(0deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
-            animation: gridMove 10s linear infinite;
+            animation: gridMove 5s linear infinite;
             z-index: 0;
         }
 
@@ -189,37 +189,97 @@
             height: 2px;
             background: rgba(0, 255, 255, 0.8);
             border-radius: 50%;
-            animation: particleFloat 8s linear infinite;
+            animation: particleFloat 4s linear infinite;
         }
 
         .particle:nth-child(1) {
             left: 20%;
             animation-delay: 0s;
-            animation-duration: 6s;
+            animation-duration: 3s;
         }
 
         .particle:nth-child(2) {
             left: 40%;
-            animation-delay: 1s;
-            animation-duration: 8s;
+            animation-delay: 0.5s;
+            animation-duration: 4s;
         }
 
         .particle:nth-child(3) {
             left: 60%;
-            animation-delay: 2s;
-            animation-duration: 7s;
+            animation-delay: 1s;
+            animation-duration: 3.5s;
         }
 
         .particle:nth-child(4) {
             left: 80%;
-            animation-delay: 3s;
-            animation-duration: 9s;
+            animation-delay: 1.5s;
+            animation-duration: 4.5s;
         }
 
         .particle:nth-child(5) {
             left: 10%;
-            animation-delay: 4s;
-            animation-duration: 5s;
+            animation-delay: 2s;
+            animation-duration: 2.5s;
+        }
+
+        .particle:nth-child(6) {
+            left: 30%;
+            animation-delay: 2.5s;
+            animation-duration: 3s;
+        }
+
+        .particle:nth-child(7) {
+            left: 50%;
+            animation-delay: 0.75s;
+            animation-duration: 3.5s;
+        }
+
+        .particle:nth-child(8) {
+            left: 70%;
+            animation-delay: 1.25s;
+            animation-duration: 2.75s;
+        }
+
+        .particle:nth-child(9) {
+            left: 90%;
+            animation-delay: 1.75s;
+            animation-duration: 3.25s;
+        }
+
+        .particle:nth-child(10) {
+            left: 15%;
+            animation-delay: 0.25s;
+            animation-duration: 2.25s;
+        }
+
+        .particle:nth-child(11) {
+            left: 35%;
+            animation-delay: 0.6s;
+            animation-duration: 4.25s;
+        }
+
+        .particle:nth-child(12) {
+            left: 55%;
+            animation-delay: 1.4s;
+            animation-duration: 3.1s;
+        }
+
+        .particle:nth-child(13) {
+            left: 75%;
+            animation-delay: 2.1s;
+            animation-duration: 2.9s;
+        }
+
+        .particle:nth-child(14) {
+            left: 85%;
+            animation-delay: 0.4s;
+            animation-duration: 3.75s;
+        }
+
+        .particle:nth-child(15) {
+            left: 25%;
+            animation-delay: 1.9s;
+            animation-duration: 2.4s;
         }
 
         @keyframes gridMove {
@@ -1397,6 +1457,16 @@
                 <div class="particle"></div>
                 <div class="particle"></div>
                 <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
             </div>
             
             <div class="logo">QUADRIS</div>
@@ -1628,6 +1698,7 @@
         let gameStarted = false;
 
         function startAnonymousGame() {
+            console.log('startAnonymousGame 함수 호출됨');
             console.log('익명 게임 시작 중...');
             console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
             console.log('Canvas 요소:', document.getElementById('gameCanvas'));
@@ -1788,6 +1859,7 @@
             }
 
         function showRanking() {
+            console.log('showRanking 함수 호출됨');
             console.log('랭킹 모달 열기');
             document.getElementById('rankingModal').classList.add('show');
             
@@ -1876,6 +1948,7 @@
 
         // 닉네임 설정 및 인증 함수들
         async function toggleAuth() {
+            console.log('toggleAuth 함수 호출됨');
             const nicknameInput = document.getElementById('nicknameInput');
             const authBtn = document.getElementById('authBtn');
             const nickname = nicknameInput.value.trim();
@@ -2054,6 +2127,35 @@
             
             // 모바일 컨트롤 가이드 표시
             showMobileControlsIfNeeded();
+            
+            // 버튼 이벤트 리스너 추가 (안전장치)
+            const anonymousBtn = document.querySelector('.start-btn[onclick="startAnonymousGame()"]');
+            const loginBtn = document.querySelector('.start-btn[onclick="startGameWithLogin()"]');
+            const rankingBtn = document.querySelector('.start-btn[onclick="showRanking()"]');
+            
+            if (anonymousBtn) {
+                anonymousBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('익명 게임 버튼 클릭됨');
+                    startAnonymousGame();
+                });
+            }
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('로그인 게임 버튼 클릭됨');
+                    startGameWithLogin();
+                });
+            }
+            
+            if (rankingBtn) {
+                rankingBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('랭킹 버튼 클릭됨');
+                    showRanking();
+                });
+            }
         });
 
         // 창 크기 변경 시 모바일 감지
@@ -2062,6 +2164,7 @@
         });
 
         function startGameWithLogin() {
+            console.log('startGameWithLogin 함수 호출됨');
             const nicknameInput = document.getElementById('nicknameInput');
             const nickname = nicknameInput.value.trim();
             
