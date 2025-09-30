@@ -1055,6 +1055,9 @@
                         // Firebase 인증 설정
                         setupFirebaseAuth();
                         
+                        // 사용자 상태 업데이트
+                        updateUserStatus();
+                        
                         console.log('게임 시작 완료!');
                     }
                 } catch (error) {
@@ -1153,16 +1156,25 @@
                 if (game && game.currentUser) {
                     // 로그아웃
                     await game.signOut();
+                    updateAuthStatus('로그아웃되었습니다', 'success');
                 } else {
+                    // 게임이 시작되지 않았으면 먼저 게임을 시작
+                    if (!game) {
+                        updateAuthStatus('게임을 먼저 시작해주세요', 'error');
+                        return;
+                    }
+                    
                     // 닉네임으로 로그인
                     await game.signInWithNickname(nickname);
+                    updateAuthStatus('로그인 성공! 게임을 시작하세요', 'success');
                 }
             } catch (error) {
                 console.error('인증 오류:', error);
-                updateAuthStatus('인증 중 오류가 발생했습니다', 'error');
+                updateAuthStatus('인증 중 오류가 발생했습니다: ' + error.message, 'error');
             } finally {
                 authBtn.disabled = false;
                 authBtn.textContent = game && game.currentUser ? '로그아웃' : '시작하기';
+                updateUserStatus();
             }
         }
 
@@ -1199,6 +1211,8 @@
                         }
                     }
                 });
+            } else {
+                console.warn('Firebase 인증 모듈이 로드되지 않았습니다. 로컬 모드로 실행됩니다.');
             }
         }
 
@@ -1249,10 +1263,18 @@
             }
         }
 
-        // 엔터 키로 게임 시작
+        // 엔터 키 이벤트 처리
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Enter' && !gameStarted) {
-                startGame();
+            if (e.code === 'Enter') {
+                if (!gameStarted) {
+                    startGame();
+                } else {
+                    // 닉네임 입력 필드에서 엔터 키
+                    const nicknameInput = document.getElementById('nicknameInput');
+                    if (document.activeElement === nicknameInput && nicknameInput.value.trim()) {
+                        toggleAuth();
+                    }
+                }
             }
         });
 
