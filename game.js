@@ -924,7 +924,7 @@ class Tetris3D {
 
     async saveScoreToFirebase(score) {
         try {
-            const userName = this.currentUser.displayName || '익명';
+            const userName = this.currentUser.nickname || this.currentUser.displayName || '익명';
             const scoreData = {
                 name: userName,
                 score: score,
@@ -932,26 +932,55 @@ class Tetris3D {
                 timestamp: new Date().toISOString()
             };
 
-            // 개인 최고 점수 업데이트
+            // 개인 최고 점수 업데이트 (인당 1개 기록만 유지)
             if (score > this.userBestScore) {
                 this.userBestScore = score;
+                
+                // 사용자 개인 최고 점수 업데이트
                 await window.firebaseSetDoc(
                     window.firebaseDoc(window.firebaseDb, 'userScores', this.currentUser.uid),
                     scoreData
                 );
-            }
 
-            // 전체 랭킹에 추가
-            await window.firebaseSetDoc(
-                window.firebaseDoc(window.firebaseCollection(window.firebaseDb, 'scores')),
-                scoreData
-            );
+                // 전체 랭킹에서 해당 사용자의 기존 기록 삭제 후 새 기록 추가
+                await this.updateGlobalRanking(scoreData);
+            }
 
             console.log('Firebase에 점수 저장 완료:', score);
             this.loadRankingFromFirebase(); // 랭킹 새로고침
         } catch (error) {
             console.error('Firebase 점수 저장 실패:', error);
             this.saveScoreToLocal(score);
+        }
+    }
+
+    async updateGlobalRanking(scoreData) {
+        try {
+            // 해당 사용자의 기존 기록 찾기 및 삭제
+            const q = window.firebaseQuery(
+                window.firebaseCollection(window.firebaseDb, 'scores'),
+                window.firebaseOrderBy('userId', 'asc')
+            );
+            const querySnapshot = await window.firebaseGetDocs(q);
+            
+            for (const doc of querySnapshot.docs) {
+                const data = doc.data();
+                if (data.userId === this.currentUser.uid) {
+                    // 기존 기록 삭제
+                    await doc.ref.delete();
+                    console.log('기존 기록 삭제:', data.score);
+                }
+            }
+
+            // 새 기록 추가
+            await window.firebaseSetDoc(
+                window.firebaseDoc(window.firebaseCollection(window.firebaseDb, 'scores')),
+                scoreData
+            );
+            
+            console.log('글로벌 랭킹 업데이트 완료');
+        } catch (error) {
+            console.error('글로벌 랭킹 업데이트 실패:', error);
         }
     }
 
@@ -976,25 +1005,74 @@ class Tetris3D {
     
     updateRankingUI() {
         const rankingList = document.getElementById('rankingList');
+        const totalPlayers = document.getElementById('totalPlayers');
+        const yourRank = document.getElementById('yourRank');
+        
         if (!rankingList) return;
         
         rankingList.innerHTML = '';
         
+        // 총 플레이어 수 업데이트
+        if (totalPlayers) {
+            totalPlayers.textContent = this.ranking.length;
+        }
+        
+        // 내 순위 찾기
+        let myRank = -1;
+        if (this.currentUser) {
+            const myIndex = this.ranking.findIndex(entry => entry.userId === this.currentUser.uid);
+            if (myIndex !== -1) {
+                myRank = myIndex + 1;
+            }
+        }
+        
+        if (yourRank) {
+            yourRank.textContent = myRank > 0 ? myRank : '-';
+        }
+        
+        // 랭킹 아이템 생성
         this.ranking.forEach((entry, index) => {
             const rankingItem = document.createElement('div');
-            rankingItem.className = 'ranking-item';
-            
             const rank = index + 1;
-            const rankText = rank <= 3 ? `${rank}위` : `${rank}위`;
+            
+            // 클래스 설정
+            let itemClass = 'ranking-item';
+            if (rank <= 3) {
+                itemClass += ' top3';
+            }
+            if (this.currentUser && entry.userId === this.currentUser.uid) {
+                itemClass += ' current-user';
+            }
+            
+            rankingItem.className = itemClass;
+            
+            // 순위 배지 클래스
+            let rankBadgeClass = 'rank-other';
+            if (rank === 1) rankBadgeClass = 'rank-1';
+            else if (rank === 2) rankBadgeClass = 'rank-2';
+            else if (rank === 3) rankBadgeClass = 'rank-3';
             
             rankingItem.innerHTML = `
-                <span class="rank">${rankText}</span>
-                <span class="player-name">${entry.name}</span>
-                <span class="score">${entry.score.toLocaleString()}</span>
+                <div class="rank-badge ${rankBadgeClass}">${rank}</div>
+                <div class="player-info">
+                    <div class="player-name">${entry.name}</div>
+                    <div class="player-score">${entry.timestamp ? new Date(entry.timestamp).toLocaleDateString() : '오늘'}</div>
+                </div>
+                <div class="score-value">${entry.score.toLocaleString()}</div>
             `;
             
             rankingList.appendChild(rankingItem);
         });
+        
+        // 랭킹이 비어있을 때 메시지 표시
+        if (this.ranking.length === 0) {
+            rankingList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.5);">
+                    아직 기록이 없습니다.<br>
+                    첫 번째 기록을 만들어보세요!
+                </div>
+            `;
+        }
     }
     
     restartGame() {
@@ -1090,17 +1168,45 @@ class Tetris3D {
     }
 
     // Firebase 인증 함수들
-    async signInAnonymously() {
+    async signInWithNickname(nickname) {
         try {
             if (window.firebaseSignIn && window.firebaseAuth) {
                 const result = await window.firebaseSignIn(window.firebaseAuth);
                 console.log('익명 로그인 성공:', result.user);
+                
+                // 닉네임을 사용자 객체에 추가
+                result.user.nickname = nickname;
                 this.currentUser = result.user;
+                
+                // Firebase에 사용자 정보 저장
+                await this.saveUserProfile(nickname);
+                
                 return result.user;
             }
         } catch (error) {
-            console.error('익명 로그인 실패:', error);
+            console.error('닉네임 로그인 실패:', error);
             throw error;
+        }
+    }
+
+    async saveUserProfile(nickname) {
+        try {
+            if (window.firebaseDb && this.currentUser) {
+                const userData = {
+                    nickname: nickname,
+                    uid: this.currentUser.uid,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                };
+                
+                await window.firebaseSetDoc(
+                    window.firebaseDoc(window.firebaseDb, 'users', this.currentUser.uid),
+                    userData
+                );
+                console.log('사용자 프로필 저장 완료:', nickname);
+            }
+        } catch (error) {
+            console.error('사용자 프로필 저장 실패:', error);
         }
     }
 

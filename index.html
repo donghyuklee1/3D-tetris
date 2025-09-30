@@ -256,6 +256,129 @@
             transition: all 0.1s ease;
         }
 
+        .main-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .start-btn.secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1rem;
+            padding: 12px 30px;
+        }
+
+        .start-btn.secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 로그인 섹션 스타일 */
+        .login-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+            min-width: 350px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .username {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .best-score {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #nicknameInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        #nicknameInput:focus {
+            outline: none;
+            border-color: rgba(255, 140, 0, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.2);
+        }
+
+        #nicknameInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-status {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+        }
+
         @keyframes smoothGradientMove {
             0% { background-position: 0% 50%; }
             33% { background-position: 100% 50%; }
@@ -413,7 +536,7 @@
         }
 
         /* 게임 오버 모달 */
-        #gameOverModal, #rankingModal {
+        #gameOverModal {
             position: fixed;
             top: 0;
             left: 0;
@@ -426,64 +549,187 @@
             z-index: 200;
         }
 
-        #gameOverModal.show, #rankingModal.show {
+        #gameOverModal.show {
             display: flex;
         }
 
-        /* 랭킹 스타일 */
-        #rankingList {
-            margin: 20px 0;
-            min-height: 200px;
+        /* Tetrio 스타일 랭킹 모달 */
+        #rankingModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        #rankingModal.show {
+            display: flex;
+        }
+
+        .ranking-modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .ranking-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ranking-title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .ranking-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .ranking-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .ranking-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
         }
 
         .ranking-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            margin: 8px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            border-left: 4px solid #4ecdc4;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .ranking-item:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
         }
 
-        .ranking-item:nth-child(1) {
-            border-left-color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
+        .ranking-item.top3 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.05));
+            border-color: rgba(255, 215, 0, 0.3);
         }
 
-        .ranking-item:nth-child(2) {
-            border-left-color: #c0c0c0;
-            background: rgba(192, 192, 192, 0.1);
+        .ranking-item.current-user {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.1));
+            border-color: rgba(102, 126, 234, 0.4);
         }
 
-        .ranking-item:nth-child(3) {
-            border-left-color: #cd7f32;
-            background: rgba(205, 127, 50, 0.1);
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 15px;
+            flex-shrink: 0;
         }
 
-        .rank {
-            font-weight: bold;
-            color: #4ecdc4;
-            min-width: 50px;
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb347); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e5e5e5); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa520); color: #fff; }
+        .rank-other { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+        .player-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .player-name {
-            flex: 1;
-            margin: 0 20px;
-            font-weight: 500;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 3px;
         }
 
-        .score {
-            font-weight: bold;
-            color: #ff6b6b;
-            font-family: 'Orbitron', monospace;
+        .player-score {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .score-value {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-left: auto;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .ranking-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
         .modal-content {
@@ -612,11 +858,28 @@
         <div id="splashScreen">
             <div class="logo">3D TETRIS</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
-            <button class="start-btn" onclick="startGame()">게임 시작</button>
-            <button class="start-btn" onclick="showRanking()" style="margin-top: 15px; font-size: 1rem; padding: 12px 30px;">🏆 랭킹</button>
-            <div id="userStatus" style="margin-top: 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
-                <div id="loginStatus">익명으로 플레이 중</div>
-                <button id="loginBtn" onclick="toggleLogin()" style="margin-top: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 8px 16px; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">로그인</button>
+            <div class="main-buttons">
+                <button class="start-btn" onclick="startGame()">게임 시작</button>
+                <button class="start-btn secondary" onclick="showRanking()">🏆 랭킹</button>
+            </div>
+            
+            <!-- 로그인 섹션 -->
+            <div class="login-section">
+                <div class="user-profile" id="userProfile">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-info">
+                        <div class="username" id="username">익명 사용자</div>
+                        <div class="best-score" id="bestScore">최고 점수: 없음</div>
+                    </div>
+                </div>
+                
+                <div class="login-controls" id="loginControls">
+                    <div class="input-group">
+                        <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20">
+                        <button class="auth-btn" id="authBtn" onclick="toggleAuth()">시작하기</button>
+                    </div>
+                    <div class="auth-status" id="authStatus">닉네임을 설정하고 게임을 시작하세요</div>
+                </div>
             </div>
             <div class="footer">@made by 💙 with 동혁 (ft. 세윤)</div>
         </div>
@@ -681,27 +944,29 @@
 
         <!-- 랭킹 모달 -->
         <div id="rankingModal">
-            <div class="modal-content">
-                <h2>🏆 랭킹</h2>
-                <div id="rankingList">
-                    <div class="ranking-item">
-                        <span class="rank">1위</span>
-                        <span class="player-name">동혁</span>
-                        <span class="score">10,000</span>
+            <div class="ranking-modal-content">
+                <div class="ranking-header">
+                    <h2 class="ranking-title">🏆 LEADERBOARD</h2>
+                    <div class="ranking-subtitle">전 세계 최고 점수 순위</div>
+                </div>
+                
+                <div class="ranking-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalPlayers">0</div>
+                        <div class="stat-label">총 플레이어</div>
                     </div>
-                    <div class="ranking-item">
-                        <span class="rank">2위</span>
-                        <span class="player-name">세윤</span>
-                        <span class="score">8,500</span>
-                    </div>
-                    <div class="ranking-item">
-                        <span class="rank">3위</span>
-                        <span class="player-name">AI</span>
-                        <span class="score">7,200</span>
+                    <div class="stat-item">
+                        <div class="stat-value" id="yourRank">-</div>
+                        <div class="stat-label">내 순위</div>
                     </div>
                 </div>
-                <div class="modal-buttons">
-                    <button class="modal-btn primary" onclick="hideRanking()">닫기</button>
+                
+                <div class="ranking-list" id="rankingList">
+                    <!-- 랭킹 아이템들이 여기에 동적으로 추가됩니다 -->
+                </div>
+                
+                <div class="ranking-footer">
+                    <button class="close-btn" onclick="hideRanking()">닫기</button>
                 </div>
             </div>
         </div>
@@ -837,14 +1102,57 @@
             document.getElementById('rankingModal').classList.remove('show');
         }
 
-        // Firebase 인증 함수들
-        async function toggleLogin() {
-            if (game && game.currentUser) {
-                // 로그아웃
-                await game.signOut();
+        // 닉네임 설정 및 인증 함수들
+        async function toggleAuth() {
+            const nicknameInput = document.getElementById('nicknameInput');
+            const authBtn = document.getElementById('authBtn');
+            const nickname = nicknameInput.value.trim();
+
+            if (!nickname) {
+                updateAuthStatus('닉네임을 입력해주세요', 'error');
+                return;
+            }
+
+            if (nickname.length < 2) {
+                updateAuthStatus('닉네임은 2자 이상 입력해주세요', 'error');
+                return;
+            }
+
+            if (nickname.length > 20) {
+                updateAuthStatus('닉네임은 20자 이하로 입력해주세요', 'error');
+                return;
+            }
+
+            try {
+                authBtn.disabled = true;
+                authBtn.textContent = '처리 중...';
+                
+                if (game && game.currentUser) {
+                    // 로그아웃
+                    await game.signOut();
+                } else {
+                    // 닉네임으로 로그인
+                    await game.signInWithNickname(nickname);
+                }
+            } catch (error) {
+                console.error('인증 오류:', error);
+                updateAuthStatus('인증 중 오류가 발생했습니다', 'error');
+            } finally {
+                authBtn.disabled = false;
+                authBtn.textContent = game && game.currentUser ? '로그아웃' : '시작하기';
+            }
+        }
+
+        function updateAuthStatus(message, type = 'info') {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.textContent = message;
+            
+            if (type === 'error') {
+                authStatus.style.color = '#ff6b6b';
+            } else if (type === 'success') {
+                authStatus.style.color = '#4ecdc4';
             } else {
-                // 로그인
-                await game.signInAnonymously();
+                authStatus.style.color = 'rgba(255, 255, 255, 0.7)';
             }
         }
 
@@ -872,19 +1180,34 @@
         }
 
         function updateUserStatus() {
-            const loginStatus = document.getElementById('loginStatus');
-            const loginBtn = document.getElementById('loginBtn');
+            const username = document.getElementById('username');
+            const bestScore = document.getElementById('bestScore');
+            const authBtn = document.getElementById('authBtn');
+            const nicknameInput = document.getElementById('nicknameInput');
             
             if (game && game.currentUser) {
-                const userName = game.currentUser.displayName || '익명 사용자';
-                loginStatus.textContent = `${userName}으로 로그인됨`;
+                const userName = game.currentUser.nickname || game.currentUser.displayName || '익명 사용자';
+                username.textContent = userName;
+                
                 if (game.userBestScore > 0) {
-                    loginStatus.textContent += ` (최고 점수: ${game.userBestScore})`;
+                    bestScore.textContent = `최고 점수: ${game.userBestScore.toLocaleString()}`;
+                } else {
+                    bestScore.textContent = '최고 점수: 없음';
                 }
-                loginBtn.textContent = '로그아웃';
+                
+                authBtn.textContent = '로그아웃';
+                authBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+                nicknameInput.disabled = true;
+                nicknameInput.value = userName;
+                updateAuthStatus('로그인됨 - 게임을 시작하세요!', 'success');
             } else {
-                loginStatus.textContent = '익명으로 플레이 중';
-                loginBtn.textContent = '로그인';
+                username.textContent = '익명 사용자';
+                bestScore.textContent = '최고 점수: 없음';
+                authBtn.textContent = '시작하기';
+                authBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                nicknameInput.disabled = false;
+                nicknameInput.value = '';
+                updateAuthStatus('닉네임을 설정하고 게임을 시작하세요', 'info');
             }
         }
 
@@ -926,4 +1249,5 @@
         });
     </script>
 </body>
+</html>
 </html>
