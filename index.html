@@ -51,8 +51,26 @@
         }
 
         @keyframes subtleScanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100px); }
+            0% { 
+                transform: translateY(0);
+                opacity: 0.02;
+            }
+            25% { 
+                transform: translateY(25px);
+                opacity: 0.03;
+            }
+            50% { 
+                transform: translateY(50px);
+                opacity: 0.02;
+            }
+            75% { 
+                transform: translateY(75px);
+                opacity: 0.03;
+            }
+            100% { 
+                transform: translateY(100px);
+                opacity: 0.02;
+            }
         }
 
         #gameContainer {
@@ -135,9 +153,17 @@
                 transform: translateY(0) scale(1);
                 opacity: 0.8;
             }
+            25% {
+                transform: translateY(50px) scale(1.01);
+                opacity: 0.6;
+            }
             50% {
                 transform: translateY(100px) scale(1.02);
                 opacity: 0.4;
+            }
+            75% {
+                transform: translateY(150px) scale(1.01);
+                opacity: 0.6;
             }
             100% { 
                 transform: translateY(200px) scale(1);
@@ -149,14 +175,27 @@
             0% { 
                 opacity: 0.3;
                 filter: blur(0px);
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.45;
+                filter: blur(1px);
+                transform: scale(1.02);
             }
             50% {
                 opacity: 0.6;
                 filter: blur(2px);
+                transform: scale(1.05);
+            }
+            75% {
+                opacity: 0.45;
+                filter: blur(1px);
+                transform: scale(1.02);
             }
             100% { 
                 opacity: 0.3;
                 filter: blur(0px);
+                transform: scale(1);
             }
         }
 
@@ -167,9 +206,11 @@
             right: 0;
             bottom: 0;
             background: 
-                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
+                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 25px 25px, 25px 25px;
             animation: gridMove 5s linear infinite;
             z-index: 0;
         }
@@ -189,117 +230,172 @@
             height: 2px;
             background: rgba(0, 255, 255, 0.8);
             border-radius: 50%;
-            animation: particleFloat 4s linear infinite;
+            animation: particleFloat 6s linear infinite;
         }
 
         .particle:nth-child(1) {
             left: 20%;
             animation-delay: 0s;
-            animation-duration: 3s;
+            animation-duration: 6s;
         }
 
         .particle:nth-child(2) {
             left: 40%;
-            animation-delay: 0.5s;
-            animation-duration: 4s;
+            animation-delay: 0.4s;
+            animation-duration: 6.5s;
         }
 
         .particle:nth-child(3) {
             left: 60%;
-            animation-delay: 1s;
-            animation-duration: 3.5s;
+            animation-delay: 0.8s;
+            animation-duration: 5.5s;
         }
 
         .particle:nth-child(4) {
             left: 80%;
-            animation-delay: 1.5s;
-            animation-duration: 4.5s;
+            animation-delay: 1.2s;
+            animation-duration: 7s;
         }
 
         .particle:nth-child(5) {
             left: 10%;
-            animation-delay: 2s;
-            animation-duration: 2.5s;
+            animation-delay: 1.6s;
+            animation-duration: 5s;
         }
 
         .particle:nth-child(6) {
             left: 30%;
-            animation-delay: 2.5s;
-            animation-duration: 3s;
+            animation-delay: 2s;
+            animation-duration: 6.2s;
         }
 
         .particle:nth-child(7) {
             left: 50%;
-            animation-delay: 0.75s;
-            animation-duration: 3.5s;
+            animation-delay: 2.4s;
+            animation-duration: 5.8s;
         }
 
         .particle:nth-child(8) {
             left: 70%;
-            animation-delay: 1.25s;
-            animation-duration: 2.75s;
+            animation-delay: 2.8s;
+            animation-duration: 6.8s;
         }
 
         .particle:nth-child(9) {
             left: 90%;
-            animation-delay: 1.75s;
-            animation-duration: 3.25s;
+            animation-delay: 3.2s;
+            animation-duration: 5.3s;
         }
 
         .particle:nth-child(10) {
             left: 15%;
-            animation-delay: 0.25s;
-            animation-duration: 2.25s;
+            animation-delay: 3.6s;
+            animation-duration: 6.7s;
         }
 
         .particle:nth-child(11) {
             left: 35%;
-            animation-delay: 0.6s;
-            animation-duration: 4.25s;
+            animation-delay: 4s;
+            animation-duration: 5.7s;
         }
 
         .particle:nth-child(12) {
             left: 55%;
-            animation-delay: 1.4s;
-            animation-duration: 3.1s;
+            animation-delay: 4.4s;
+            animation-duration: 6.3s;
         }
 
         .particle:nth-child(13) {
             left: 75%;
-            animation-delay: 2.1s;
-            animation-duration: 2.9s;
+            animation-delay: 4.8s;
+            animation-duration: 5.9s;
         }
 
         .particle:nth-child(14) {
             left: 85%;
-            animation-delay: 0.4s;
-            animation-duration: 3.75s;
+            animation-delay: 5.2s;
+            animation-duration: 6.4s;
         }
 
         .particle:nth-child(15) {
             left: 25%;
-            animation-delay: 1.9s;
-            animation-duration: 2.4s;
+            animation-delay: 5.6s;
+            animation-duration: 5.6s;
+        }
+
+        .particle:nth-child(16) {
+            left: 45%;
+            animation-delay: 6s;
+            animation-duration: 6.1s;
+        }
+
+        .particle:nth-child(17) {
+            left: 65%;
+            animation-delay: 6.4s;
+            animation-duration: 5.4s;
+        }
+
+        .particle:nth-child(18) {
+            left: 85%;
+            animation-delay: 6.8s;
+            animation-duration: 6.9s;
+        }
+
+        .particle:nth-child(19) {
+            left: 5%;
+            animation-delay: 7.2s;
+            animation-duration: 5.2s;
+        }
+
+        .particle:nth-child(20) {
+            left: 95%;
+            animation-delay: 7.6s;
+            animation-duration: 6.6s;
         }
 
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
+            25% { transform: translate(12.5px, 12.5px); }
+            50% { transform: translate(25px, 25px); }
+            75% { transform: translate(37.5px, 37.5px); }
             100% { transform: translate(50px, 50px); }
         }
 
         @keyframes particleFloat {
             0% {
-                transform: translateY(100vh) translateX(0);
+                transform: translateY(120vh) translateX(0) scale(0.5);
                 opacity: 0;
+            }
+            5% {
+                opacity: 0.3;
+                transform: translateY(100vh) translateX(10px) scale(0.7);
             }
             10% {
                 opacity: 1;
+                transform: translateY(80vh) translateX(20px) scale(1);
+            }
+            20% {
+                opacity: 1;
+                transform: translateY(60vh) translateX(30px) scale(1.1);
+            }
+            40% {
+                opacity: 1;
+                transform: translateY(40vh) translateX(40px) scale(1);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(20vh) translateX(35px) scale(0.9);
+            }
+            80% {
+                opacity: 0.8;
+                transform: translateY(0vh) translateX(45px) scale(0.8);
             }
             90% {
-                opacity: 1;
+                opacity: 0.4;
+                transform: translateY(-20vh) translateX(50px) scale(0.6);
             }
             100% {
-                transform: translateY(-100px) translateX(50px);
+                transform: translateY(-40vh) translateX(50px) scale(0.3);
                 opacity: 0;
             }
         }
@@ -1452,6 +1548,11 @@
             <!-- 레트로 배경 요소들 -->
             <div class="retro-grid"></div>
             <div class="retro-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
                 <div class="particle"></div>
                 <div class="particle"></div>
                 <div class="particle"></div>
