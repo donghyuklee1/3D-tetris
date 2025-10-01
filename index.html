@@ -2075,68 +2075,36 @@
         });
 
 
-        // 즉시 실행되는 전역 이벤트 리스너
-        function setupButtonListeners() {
-            // 전역 클릭 이벤트로 모드 버튼 처리
-            document.addEventListener('click', (e) => {
-                const modeBtn = e.target.closest('.mode-btn[data-mode]');
-                if (modeBtn) {
+        // 간단한 버튼 이벤트 시스템
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM 로드 완료 - 버튼 이벤트 설정');
+            
+            // ZEN 버튼 이벤트
+            const zenBtn = document.querySelector('.mode-zen');
+            if (zenBtn) {
+                zenBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation();
-                    const mode = modeBtn.getAttribute('data-mode');
-                    console.log(`🔥 전역 클릭으로 ${mode} 모드 시작!`);
-                    startGameMode(mode);
-                    return;
-                }
-                
-                const rankingBtn = e.target.closest('#rankingBtn');
-                if (rankingBtn) {
+                    console.log('🎮 ZEN 버튼 클릭됨 - 게임 시작');
+                    startZenGame();
+                });
+                console.log('ZEN 버튼 이벤트 등록됨');
+            } else {
+                console.error('ZEN 버튼을 찾을 수 없습니다!');
+            }
+            
+            // 랭킹 버튼 이벤트
+            const rankingBtn = document.getElementById('rankingBtn');
+            if (rankingBtn) {
+                rankingBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🏆 전역 클릭으로 랭킹 열기!');
-                    showRanking();
-                    return;
-                }
-            });
-
-            // 마우스 업 이벤트 추가 (PC용)
-            document.addEventListener('mouseup', (e) => {
-                const modeBtn = e.target.closest('.mode-btn[data-mode]');
-                if (modeBtn) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const mode = modeBtn.getAttribute('data-mode');
-                    console.log(`🖱️ 마우스 업으로 ${mode} 모드 시작!`);
-                    startGameMode(mode);
-                    return;
-                }
-            });
-
-            // 터치 이벤트 (모바일용)
-            document.addEventListener('touchend', (e) => {
-                const modeBtn = e.target.closest('.mode-btn[data-mode]');
-                if (modeBtn) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const mode = modeBtn.getAttribute('data-mode');
-                    console.log(`📱 터치로 ${mode} 모드 시작!`);
-                    startGameMode(mode);
-                    return;
-                }
-                
-                const rankingBtn = e.target.closest('#rankingBtn');
-                if (rankingBtn) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('📱 터치로 랭킹 열기!');
-                    showRanking();
-                    return;
-                }
-            });
-        }
-
-        // 즉시 실행
-        setupButtonListeners();
+                    console.log('🏆 랭킹 버튼 클릭됨 - 랭킹 열기');
+                    openRanking();
+                });
+                console.log('랭킹 버튼 이벤트 등록됨');
+            } else {
+                console.error('랭킹 버튼을 찾을 수 없습니다!');
+            }
+        });
 
         // 잠금된 버튼 애니메이션
         window.showLockedAnimation = function(button) {
@@ -2207,194 +2175,110 @@
         `;
         document.head.appendChild(fadeInOutStyle);
 
-        // 게임 모드 시작 함수 (전역 함수로 만들기)
-        window.startGameMode = function(mode) {
-            console.log(`=== ${mode} 모드 시작 ===`);
-            console.log('게임 시작 전 상태:', { gameStarted, game: !!game });
+        // ZEN 게임 시작 함수
+        function startZenGame() {
+            console.log('🎮 ZEN 게임 시작');
             
-            // 게임 모드에 따른 UI 설정
-            setupGameModeUI(mode);
-            
-            // 바로 게임 시작 (로그인 없이)
-            startGame(mode);
-        };
-
-        // 게임 모드별 UI 설정
-        function setupGameModeUI(mode) {
-            const gameModeElement = document.getElementById('gameMode');
-            const timerElement = document.getElementById('timer');
-            const planesElement = document.getElementById('planes');
-            
-            if (!gameModeElement) return;
-            
-            // 이전 타이머 정리
-            if (window.gameTimer) {
-                clearInterval(window.gameTimer);
-                window.gameTimer = null;
+            // 스플래시 화면 숨기기
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) {
+                splashScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
             }
             
-            switch(mode) {
-                case '40planes':
-                    gameModeElement.textContent = '40 PLANES';
-                    gameModeElement.style.color = '#ff6b6b';
-                    if (timerElement) {
-                        timerElement.style.display = 'none';
+            // 로딩 화면 표시
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'block';
+            }
+            
+            // 게임 초기화
+            setTimeout(() => {
+                try {
+                    if (loading) {
+                        loading.style.display = 'none';
                     }
-                    if (planesElement) {
-                        planesElement.style.display = 'block';
-                        planesElement.textContent = 'Planes: 0/40';
-                    }
-                    // 40 PLANES 모드 시작 시간 기록
-                    window.startTime = Date.now();
-                    break;
                     
-                case 'blitz':
-                    gameModeElement.textContent = 'BLITZ';
-                    gameModeElement.style.color = '#4ecdc4';
-                    if (timerElement) {
-                        timerElement.style.display = 'block';
-                        timerElement.textContent = 'Time: 02:00';
-                        // BLITZ 모드 타이머 시작
-                        startBlitzTimer();
+                    if (!gameStarted) {
+                        console.log('Tetris3D 인스턴스 생성 중...');
+                        
+                        // Three.js 로드 확인
+                        if (typeof THREE === 'undefined') {
+                            throw new Error('Three.js가 로드되지 않았습니다!');
+                        }
+                        
+                        // Canvas 요소 확인
+                        const canvas = document.getElementById('gameCanvas');
+                        if (!canvas) {
+                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
+                        }
+                        
+                        game = new Tetris3D();
+                        game.gameMode = 'zen';
+                        gameStarted = true;
+                        
+                        console.log('🎮 ZEN 게임 시작 완료!');
                     }
-                    if (planesElement) {
-                        planesElement.style.display = 'none';
+                } catch (error) {
+                    console.error('게임 시작 중 오류 발생:', error);
+                    if (loading) {
+                        loading.innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
                     }
-                    break;
                     
-                case 'zen':
-                    gameModeElement.textContent = 'ZEN';
-                    gameModeElement.style.color = '#95e1d3';
-                    if (timerElement) {
-                        timerElement.style.display = 'none';
-                    }
-                    if (planesElement) {
-                        planesElement.style.display = 'none';
-                    }
-                    break;
-            }
+                    setTimeout(() => {
+                        if (loading) {
+                            loading.style.display = 'none';
+                        }
+                        if (splashScreen) {
+                            splashScreen.style.display = 'flex';
+                            splashScreen.classList.remove('fade-out');
+                        }
+                    }, 3000);
+                }
+            }, 500);
         }
 
-        // BLITZ 모드 타이머 시작
-        function startBlitzTimer() {
-            let timeLeft = 120; // 2분 = 120초
+        // 랭킹 열기 함수
+        function openRanking() {
+            console.log('🏆 랭킹 열기');
             
-            window.gameTimer = setInterval(() => {
-                timeLeft--;
-                
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                const timeString = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                const timerElement = document.getElementById('timer');
-                if (timerElement) {
-                    timerElement.textContent = timeString;
-                    
-                    // 시간이 부족할 때 색상 변경
-                    if (timeLeft <= 30) {
-                        timerElement.style.color = '#ff6b6b';
-                        timerElement.style.animation = 'blink 1s infinite';
-                    } else if (timeLeft <= 60) {
-                        timerElement.style.color = '#ffa726';
-                    }
-                }
-                
-                // 시간 종료 시 게임 오버
-                if (timeLeft <= 0) {
-                    clearInterval(window.gameTimer);
-                    if (game && typeof game.gameOver === 'function') {
-                        game.gameOver();
-                    }
-                }
-            }, 1000);
-        }
-
-        // 40 PLANES 모드 진행률 업데이트
-        function updatePlanesProgress(planesCompleted) {
-            const planesElement = document.getElementById('planes');
-            if (planesElement && planesElement.style.display !== 'none') {
-                planesElement.textContent = `Planes: ${planesCompleted}/40`;
-                
-                // 완료율에 따른 색상 변경
-                const progress = planesCompleted / 40;
-                if (progress >= 1) {
-                    planesElement.style.color = '#4caf50';
-                    planesElement.style.animation = 'blink 0.5s infinite';
-                } else if (progress >= 0.8) {
-                    planesElement.style.color = '#ffa726';
-                } else if (progress >= 0.5) {
-                    planesElement.style.color = '#ffeb3b';
-                }
-            }
-        }
-
-        // 40 PLANES 모드 완료 시간 계산
-        function getPlanesCompletionTime() {
-            if (window.startTime) {
-                const endTime = Date.now();
-                const totalTime = endTime - window.startTime;
-                return Math.floor(totalTime / 1000); // 초 단위
-            }
-            return 0;
-        }
-
-        // 랭킹 표시 함수 (전역 함수로 만들기)
-        window.showRanking = function() {
-            console.log('🏆 랭킹 모달 열기');
-            
-            // 기존 랭킹 모달 사용
             const rankingModal = document.getElementById('rankingModal');
             if (!rankingModal) {
                 console.error('랭킹 모달을 찾을 수 없습니다!');
                 return;
             }
             
-            // 랭킹 데이터 로드 및 표시
-            if (game && typeof game.loadRanking === 'function') {
-                game.loadRanking();
-            } else {
-                loadAndDisplayRanking();
-            }
+            // 랭킹 데이터 로드
+            loadRankingData();
             
             // 모달 표시
             rankingModal.classList.add('show');
-        };
+        }
 
-        // 랭킹 모달 닫기
-        window.hideRanking = function() {
-            const rankingModal = document.getElementById('rankingModal');
-            if (rankingModal) {
-                rankingModal.classList.remove('show');
-            }
-        };
-
-
-        // 랭킹 데이터 로드 및 표시
-        function loadAndDisplayRanking(tab = 'global') {
+        // 랭킹 데이터 로드
+        function loadRankingData() {
             const rankingList = document.getElementById('rankingList');
-            if (!rankingList) return;
+            if (!rankingList) {
+                console.error('랭킹 리스트를 찾을 수 없습니다!');
+                return;
+            }
             
-            let rankingData = [];
+            // 로컬 스토리지에서 랭킹 데이터 로드
+            const rankingData = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
             
-            if (tab === 'global') {
-                // Firebase에서 글로벌 랭킹 로드 (실패 시 로컬 데이터 사용)
-                rankingData = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
-            } else {
-                // 개인 랭킹 로드
-                rankingData = JSON.parse(localStorage.getItem('tetrisPersonalRanking') || '[]');
+            if (rankingData.length === 0) {
+                rankingList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">아직 기록이 없습니다</div>';
+                return;
             }
             
             // 점수순으로 정렬
             rankingData.sort((a, b) => b.score - a.score);
             
             // 랭킹 HTML 생성
-            if (rankingData.length === 0) {
-                rankingList.innerHTML = '<div class="no-data">No ranking data available</div>';
-                return;
-            }
-            
             let rankingHTML = '';
-            rankingData.forEach((entry, index) => {
+            rankingData.slice(0, 10).forEach((entry, index) => {
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
                 const date = new Date(entry.date).toLocaleDateString();
@@ -2414,74 +2298,17 @@
             rankingList.innerHTML = rankingHTML;
         }
 
-        // 게임 오버 시 모드별 결과 처리
-        function handleGameOver(gameMode, finalScore, planesCompleted = 0) {
-            console.log(`게임 오버 - 모드: ${gameMode}, 점수: ${finalScore}, 완성된 판: ${planesCompleted}`);
-            
-            // 타이머 정리
-            if (window.gameTimer) {
-                clearInterval(window.gameTimer);
-                window.gameTimer = null;
-            }
-            
-            let resultMessage = '';
-            let isHighScore = false;
-            
-            switch(gameMode) {
-                case '40planes':
-                    const completionTime = getPlanesCompletionTime();
-                    const minutes = Math.floor(completionTime / 60);
-                    const seconds = completionTime % 60;
-                    
-                    if (planesCompleted >= 40) {
-                        resultMessage = `🎉 40 PLANES 완료!\n완료 시간: ${minutes}:${seconds.toString().padStart(2, '0')}\n최종 점수: ${finalScore}`;
-                        isHighScore = true;
-                    } else {
-                        resultMessage = `40 PLANES 모드 종료\n완성된 판: ${planesCompleted}/40\n완료 시간: ${minutes}:${seconds.toString().padStart(2, '0')}\n점수: ${finalScore}`;
-                    }
-                    break;
-                    
-                case 'blitz':
-                    resultMessage = `BLITZ 모드 종료!\n최종 점수: ${finalScore}`;
-                    isHighScore = true;
-                    break;
-                    
-                case 'zen':
-                    resultMessage = `ZEN 모드 종료!\n최종 점수: ${finalScore}`;
-                    isHighScore = true;
-                    break;
-            }
-            
-            // 게임 오버 모달 표시
-            showGameOverModal(resultMessage, isHighScore);
-            
-            // 랭킹에 점수 저장
-            saveScoreToRanking(gameMode, finalScore, planesCompleted, completionTime);
-        }
 
-        // 점수를 랭킹에 저장
-        function saveScoreToRanking(gameMode, score, planesCompleted = 0, completionTime = 0) {
-            const rankingData = {
-                nickname: '게스트',
-                score: score,
-                mode: gameMode,
-                planesCompleted: planesCompleted,
-                completionTime: completionTime,
-                date: new Date().toISOString()
-            };
-            
-            // 로컬 스토리지에 저장
-            let localRanking = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
-            localRanking.push(rankingData);
-            
-            // 최대 100개 기록만 유지
-            localRanking.sort((a, b) => b.score - a.score);
-            localRanking = localRanking.slice(0, 100);
-            
-            localStorage.setItem('tetrisGlobalRanking', JSON.stringify(localRanking));
-            
-            console.log('점수가 랭킹에 저장되었습니다:', rankingData);
-        }
+        // 랭킹 모달 닫기 (전역 함수)
+        window.hideRanking = function() {
+            console.log('🏆 랭킹 모달 닫기');
+            const rankingModal = document.getElementById('rankingModal');
+            if (rankingModal) {
+                rankingModal.classList.remove('show');
+            }
+        };
+
+
 
         // 게임 오버 모달 표시 (기존 모달 사용)
         function showGameOverModal(message, isHighScore = false) {
@@ -2545,64 +2372,6 @@
             goToMenu();
         };
 
-        // 기존 startGame 함수 수정 (모드 파라미터 추가)
-        function startGame(gameMode = 'zen') {
-            console.log(`${gameMode} 모드로 게임 시작 중...`);
-            console.log('Three.js 로드 상태:', typeof THREE !== 'undefined');
-            console.log('Canvas 요소:', document.getElementById('gameCanvas'));
-            
-            document.getElementById('splashScreen').classList.add('fade-out');
-            document.getElementById('loading').style.display = 'block';
-            
-            setTimeout(() => {
-                try {
-                    document.getElementById('splashScreen').style.display = 'none';
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    if (!gameStarted) {
-                        console.log('Tetris3D 인스턴스 생성 중...');
-                        
-                        // Three.js 로드 확인
-                        if (typeof THREE === 'undefined') {
-                            throw new Error('Three.js가 로드되지 않았습니다!');
-                        }
-                        
-                        // Canvas 요소 확인
-                        const canvas = document.getElementById('gameCanvas');
-                        if (!canvas) {
-                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
-                        }
-                        
-                        game = new Tetris3D();
-                        game.gameMode = gameMode; // 게임 모드 설정
-                        gameStarted = true;
-                        
-                        // 익명 게임 모드 설정
-                        game.isAnonymousMode = true;
-                        game.currentUser = {
-                            uid: 'anonymous_' + Date.now(),
-                            nickname: '게스트',
-                            displayName: '게스트'
-                        };
-                        
-                        // 게임 시작 완료
-                        
-                        console.log(`${gameMode} 모드 게임 시작 완료!`);
-                    }
-                } catch (error) {
-                    console.error('게임 시작 중 오류 발생:', error);
-                    console.error('오류 스택:', error.stack);
-                    document.getElementById('loading').innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
-                    
-                    // 오류 발생 시 스플래시 화면으로 돌아가기
-                    setTimeout(() => {
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('splashScreen').style.display = 'flex';
-                        document.getElementById('splashScreen').classList.remove('fade-out');
-                    }, 3000);
-                }
-            }, 500);
-        }
     </script>
 </body>
 </html>
