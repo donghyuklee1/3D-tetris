@@ -2124,13 +2124,20 @@
             }
 
             registerButton(selector, config) {
+                console.log(`버튼 등록 시도: ${selector}`);
                 const element = document.querySelector(selector);
                 if (element) {
                     this.buttons.set(element, config);
                     element.dataset.buttonType = config.type;
-                    console.log(`${config.description} 버튼 등록됨: ${selector}`);
+                    console.log(`✅ ${config.description} 버튼 등록됨: ${selector}`);
+                    console.log('요소:', element);
+                    console.log('설정:', config);
+                    return true;
                 } else {
-                    console.error(`버튼을 찾을 수 없습니다: ${selector}`);
+                    console.error(`❌ 버튼을 찾을 수 없습니다: ${selector}`);
+                    console.log('현재 DOM 상태:', document.readyState);
+                    console.log('전체 DOM:', document.body ? 'body 존재' : 'body 없음');
+                    return false;
                 }
             }
 
@@ -2150,19 +2157,39 @@
             }
 
             handleClick(e) {
+                console.log('🖱️ 클릭 이벤트 발생:', e.target);
+                console.log('클릭된 요소 태그:', e.target.tagName);
+                console.log('클릭된 요소 클래스:', e.target.className);
+                console.log('등록된 버튼 수:', this.buttons.size);
+                
                 const button = this.findButtonElement(e.target);
+                console.log('찾은 버튼:', button);
+                
                 if (button && this.buttons.has(button)) {
                     e.preventDefault();
                     e.stopPropagation();
                     
                     const config = this.buttons.get(button);
                     console.log(`🔘 버튼 클릭: ${config.description}`);
+                    console.log('버튼 설정:', config);
                     
                     // 버튼 애니메이션
                     this.animateButton(button);
                     
                     // 액션 실행
-                    config.action();
+                    try {
+                        config.action();
+                        console.log('✅ 액션 실행 완료');
+                    } catch (error) {
+                        console.error('❌ 액션 실행 중 오류:', error);
+                    }
+                } else {
+                    console.log('❌ 등록되지 않은 요소 클릭됨');
+                    if (button) {
+                        console.log('버튼은 찾았지만 등록되지 않음');
+                    } else {
+                        console.log('버튼 요소를 찾을 수 없음');
+                    }
                 }
             }
 
@@ -2391,21 +2418,95 @@
         
         // 초기화 함수
         function initializeButtonManager() {
-            if (!buttonManager) {
-                buttonManager = new ButtonManager();
-                console.log('ButtonManager 초기화 완료');
+            console.log('ButtonManager 초기화 시도...');
+            console.log('DOM 상태:', document.readyState);
+            
+            // 버튼 요소들 존재 확인
+            const zenBtn = document.querySelector('.mode-zen');
+            const rankingBtn = document.getElementById('rankingBtn');
+            
+            console.log('ZEN 버튼 발견:', !!zenBtn);
+            console.log('랭킹 버튼 발견:', !!rankingBtn);
+            
+            if (zenBtn && rankingBtn) {
+                if (!buttonManager) {
+                    buttonManager = new ButtonManager();
+                    console.log('✅ ButtonManager 초기화 완료');
+                } else {
+                    console.log('⚠️ ButtonManager 이미 존재함');
+                }
+                return true;
+            } else {
+                console.log('❌ 버튼 요소들을 찾을 수 없음 - 재시도 필요');
+                return false;
             }
         }
 
-        // 즉시 초기화 시도
-        initializeButtonManager();
-        
-        // DOM 로드 완료 후 초기화
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeButtonManager);
-        } else {
-            setTimeout(initializeButtonManager, 100);
+        // 여러 방법으로 초기화 시도
+        function tryInitializeButtonManager() {
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            const tryInit = () => {
+                attempts++;
+                console.log(`초기화 시도 ${attempts}/${maxAttempts}`);
+                
+                if (initializeButtonManager()) {
+                    console.log('✅ ButtonManager 초기화 성공!');
+                    return;
+                }
+                
+                if (attempts < maxAttempts) {
+                    setTimeout(tryInit, 200);
+                } else {
+                    console.error('❌ ButtonManager 초기화 실패 - 최대 시도 횟수 초과');
+                }
+            };
+            
+            tryInit();
         }
+
+        // 즉시 시도
+        tryInitializeButtonManager();
+        
+        // DOM 로드 완료 후 시도
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM 로드 완료 이벤트 발생');
+            tryInitializeButtonManager();
+        });
+        
+        // 윈도우 로드 완료 후 시도
+        window.addEventListener('load', () => {
+            console.log('윈도우 로드 완료 이벤트 발생');
+            tryInitializeButtonManager();
+        });
+
+        // 테스트 함수들 (전역으로 노출)
+        window.testButtons = function() {
+            console.log('=== 버튼 테스트 시작 ===');
+            console.log('ButtonManager 인스턴스:', buttonManager);
+            console.log('등록된 버튼 수:', buttonManager ? buttonManager.buttons.size : 0);
+            
+            const zenBtn = document.querySelector('.mode-zen');
+            const rankingBtn = document.getElementById('rankingBtn');
+            
+            console.log('ZEN 버튼:', zenBtn);
+            console.log('랭킹 버튼:', rankingBtn);
+            
+            if (buttonManager) {
+                console.log('ButtonManager 버튼 맵:', buttonManager.buttons);
+                buttonManager.buttons.forEach((config, element) => {
+                    console.log('등록된 버튼:', element, config);
+                });
+            }
+            console.log('=== 버튼 테스트 완료 ===');
+        };
+
+        window.forceInitButtons = function() {
+            console.log('강제 초기화 시도...');
+            buttonManager = null;
+            tryInitializeButtonManager();
+        };
 
         // 페이드 인/아웃 애니메이션 추가
         const fadeInOutStyle = document.createElement('style');
