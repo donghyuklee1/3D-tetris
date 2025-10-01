@@ -2203,10 +2203,16 @@
         function simpleInitializeButtons() {
             console.log('🔧 간단한 버튼 초기화 시작');
             
-            // ZEN 버튼
+            // ZEN 버튼 찾기
             const zenBtn = document.querySelector('.mode-zen');
+            console.log('ZEN 버튼 요소:', zenBtn);
+            
             if (zenBtn) {
-                zenBtn.addEventListener('click', (e) => {
+                // 기존 이벤트 리스너 제거 (중복 방지)
+                zenBtn.removeEventListener('click', handleZenClick);
+                
+                // 클릭 핸들러 함수 정의
+                function handleZenClick(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('🎮 ZEN 버튼 클릭됨 - 게임 시작');
@@ -2220,8 +2226,16 @@
                     }, 100);
                     
                     // 게임 시작
+                    console.log('startZenGame 함수 호출 중...');
                     startZenGame();
-                });
+                }
+                
+                // 클릭 이벤트 등록 (여러 방법으로)
+                zenBtn.addEventListener('click', handleZenClick);
+                
+                // onclick 속성도 추가 (백업용)
+                zenBtn.onclick = handleZenClick;
+                
                 // 호버 효과 추가
                 zenBtn.addEventListener('mouseenter', () => {
                     zenBtn.style.transform = 'translateY(-3px) scale(1.02)';
@@ -2233,8 +2247,14 @@
                 });
                 
                 console.log('✅ ZEN 버튼 등록 완료 (클릭 + 호버 효과 포함)');
+                
+                // 테스트용: 버튼 클릭 가능 여부 확인
+                console.log('버튼 스타일:', window.getComputedStyle(zenBtn).pointerEvents);
+                console.log('버튼 클릭 가능:', zenBtn.onclick !== null || zenBtn.hasAttribute('onclick'));
+                
             } else {
                 console.error('❌ ZEN 버튼을 찾을 수 없습니다');
+                console.log('사용 가능한 버튼들:', document.querySelectorAll('button, .mode-btn'));
             }
         }
 
@@ -2291,6 +2311,27 @@
                 }
             } catch (error) {
                 console.error('❌ 직접 게임 시작 실패:', error);
+            }
+        };
+        
+        // ZEN 버튼 클릭 테스트 함수
+        window.testZenButton = function() {
+            console.log('🧪 ZEN 버튼 테스트');
+            const zenBtn = document.querySelector('.mode-zen');
+            if (zenBtn) {
+                console.log('ZEN 버튼 발견:', zenBtn);
+                console.log('버튼 클릭 가능:', window.getComputedStyle(zenBtn).pointerEvents);
+                
+                // 강제 클릭 이벤트 발생
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                zenBtn.dispatchEvent(clickEvent);
+                console.log('클릭 이벤트 발생시킴');
+            } else {
+                console.error('ZEN 버튼을 찾을 수 없습니다');
             }
         };
 
