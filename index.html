@@ -2089,7 +2089,9 @@
             }
 
             setupEventListeners() {
-                // 전역 클릭 이벤트 리스너
+                console.log('🎧 이벤트 리스너 설정 시작...');
+                
+                // 전역 클릭 이벤트 리스너 (백업용)
                 document.addEventListener('click', (e) => {
                     this.handleClick(e);
                 });
@@ -2102,25 +2104,36 @@
                 document.addEventListener('mouseout', (e) => {
                     this.handleMouseOut(e);
                 });
+                
+                console.log('🎧 이벤트 리스너 설정 완료');
             }
 
             registerButtons() {
+                console.log('📋 버튼 등록 시작...');
+                
                 // ZEN 버튼 등록
-                this.registerButton('.mode-zen', {
+                console.log('🎮 ZEN 버튼 등록 시도...');
+                const zenSuccess = this.registerButton('.mode-zen', {
                     type: 'zen',
                     action: () => this.startZenGame(),
                     description: 'ZEN 게임 시작'
                 });
 
                 // 랭킹 버튼 등록
-                this.registerButton('#rankingBtn', {
+                console.log('🏆 랭킹 버튼 등록 시도...');
+                const rankingSuccess = this.registerButton('#rankingBtn', {
                     type: 'ranking',
                     action: () => this.openRanking(),
                     description: '랭킹 열기'
                 });
 
                 // 잠금된 버튼들 등록
+                console.log('🔒 잠금된 버튼들 등록 시도...');
                 this.registerLockedButtons();
+                
+                console.log('📋 버튼 등록 완료');
+                console.log('최종 등록된 버튼 수:', this.buttons.size);
+                console.log('등록된 버튼들:', Array.from(this.buttons.keys()));
             }
 
             registerButton(selector, config) {
@@ -2129,6 +2142,21 @@
                 if (element) {
                     this.buttons.set(element, config);
                     element.dataset.buttonType = config.type;
+                    
+                    // 직접 이벤트 리스너 추가 (백업용)
+                    element.addEventListener('click', (e) => {
+                        console.log(`🎯 직접 클릭 이벤트: ${config.description}`);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.animateButton(element);
+                        try {
+                            config.action();
+                            console.log(`✅ ${config.description} 액션 실행 완료`);
+                        } catch (error) {
+                            console.error(`❌ ${config.description} 액션 실행 중 오류:`, error);
+                        }
+                    });
+                    
                     console.log(`✅ ${config.description} 버튼 등록됨: ${selector}`);
                     console.log('요소:', element);
                     console.log('설정:', config);
@@ -2142,18 +2170,39 @@
             }
 
             registerLockedButtons() {
+                console.log('🔒 잠금된 버튼들 찾기...');
                 const lockedButtons = document.querySelectorAll('.mode-btn.locked');
-                lockedButtons.forEach(btn => {
+                console.log(`발견된 잠금된 버튼 수: ${lockedButtons.length}`);
+                
+                lockedButtons.forEach((btn, index) => {
                     const mode = btn.dataset.mode;
-                    this.buttons.set(btn, {
+                    console.log(`잠금된 버튼 ${index + 1} 등록: ${mode}`);
+                    
+                    const config = {
                         type: 'locked',
                         action: () => this.showLockedAnimation(btn),
                         description: `${mode} 모드 (잠금됨)`,
                         locked: true
-                    });
+                    };
+                    
+                    this.buttons.set(btn, config);
                     btn.dataset.buttonType = 'locked';
+                    
+                    // 직접 이벤트 리스너 추가
+                    btn.addEventListener('click', (e) => {
+                        console.log(`🔒 잠금된 버튼 클릭: ${mode}`);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.animateButton(btn);
+                        try {
+                            config.action();
+                            console.log(`✅ ${mode} 잠금 애니메이션 실행 완료`);
+                        } catch (error) {
+                            console.error(`❌ ${mode} 잠금 애니메이션 실행 중 오류:`, error);
+                        }
+                    });
                 });
-                console.log(`잠금된 버튼 ${lockedButtons.length}개 등록됨`);
+                console.log(`✅ 잠금된 버튼 ${lockedButtons.length}개 등록 완료`);
             }
 
             handleClick(e) {
@@ -2208,20 +2257,32 @@
             }
 
             findButtonElement(element) {
+                console.log('🔍 버튼 요소 찾기 시작:', element);
+                
                 // 클릭된 요소가 버튼인지 확인
                 if (this.buttons.has(element)) {
+                    console.log('✅ 직접 매칭된 버튼:', element);
                     return element;
                 }
                 
                 // 부모 요소 중 버튼 찾기
                 let current = element;
-                while (current && current !== document) {
+                let depth = 0;
+                while (current && current !== document && depth < 10) {
+                    console.log(`부모 요소 확인 (깊이 ${depth}):`, current);
+                    console.log('요소 태그:', current.tagName);
+                    console.log('요소 클래스:', current.className);
+                    console.log('요소 ID:', current.id);
+                    
                     if (this.buttons.has(current)) {
+                        console.log('✅ 부모 요소에서 버튼 찾음:', current);
                         return current;
                     }
                     current = current.parentElement;
+                    depth++;
                 }
                 
+                console.log('❌ 버튼 요소를 찾을 수 없음');
                 return null;
             }
 
