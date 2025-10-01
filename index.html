@@ -1568,6 +1568,117 @@
                 flex-direction: column;
             }
         }
+
+        /* 랭킹 모달 스타일 */
+        .ranking-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px 5px 0 0;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-bottom: 2px solid #4ecdc4;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .ranking-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .player-date {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        /* 게임 오버 모달 스타일 */
+        .game-over-message {
+            text-align: center;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .high-score-notice {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffeb3b;
+            margin-bottom: 20px;
+            animation: blink 1s infinite;
+        }
     </style>
 </head>
 <body>
@@ -2083,22 +2194,383 @@
             console.log(`=== ${mode} 모드 시작 ===`);
             console.log('게임 시작 전 상태:', { gameStarted, game: !!game });
             
+            // 게임 모드에 따른 UI 설정
+            setupGameModeUI(mode);
+            
             // 바로 게임 시작 (로그인 없이)
             startGame(mode);
         };
 
+        // 게임 모드별 UI 설정
+        function setupGameModeUI(mode) {
+            const gameModeElement = document.getElementById('gameMode');
+            const timerElement = document.getElementById('timer');
+            const planesElement = document.getElementById('planes');
+            
+            if (!gameModeElement) return;
+            
+            // 이전 타이머 정리
+            if (window.gameTimer) {
+                clearInterval(window.gameTimer);
+                window.gameTimer = null;
+            }
+            
+            switch(mode) {
+                case '40planes':
+                    gameModeElement.textContent = '40 PLANES';
+                    gameModeElement.style.color = '#ff6b6b';
+                    if (timerElement) {
+                        timerElement.style.display = 'none';
+                    }
+                    if (planesElement) {
+                        planesElement.style.display = 'block';
+                        planesElement.textContent = 'Planes: 0/40';
+                    }
+                    // 40 PLANES 모드 시작 시간 기록
+                    window.startTime = Date.now();
+                    break;
+                    
+                case 'blitz':
+                    gameModeElement.textContent = 'BLITZ';
+                    gameModeElement.style.color = '#4ecdc4';
+                    if (timerElement) {
+                        timerElement.style.display = 'block';
+                        timerElement.textContent = 'Time: 02:00';
+                        // BLITZ 모드 타이머 시작
+                        startBlitzTimer();
+                    }
+                    if (planesElement) {
+                        planesElement.style.display = 'none';
+                    }
+                    break;
+                    
+                case 'zen':
+                    gameModeElement.textContent = 'ZEN';
+                    gameModeElement.style.color = '#95e1d3';
+                    if (timerElement) {
+                        timerElement.style.display = 'none';
+                    }
+                    if (planesElement) {
+                        planesElement.style.display = 'none';
+                    }
+                    break;
+            }
+        }
+
+        // BLITZ 모드 타이머 시작
+        function startBlitzTimer() {
+            let timeLeft = 120; // 2분 = 120초
+            
+            window.gameTimer = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const timeString = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const timerElement = document.getElementById('timer');
+                if (timerElement) {
+                    timerElement.textContent = timeString;
+                    
+                    // 시간이 부족할 때 색상 변경
+                    if (timeLeft <= 30) {
+                        timerElement.style.color = '#ff6b6b';
+                        timerElement.style.animation = 'blink 1s infinite';
+                    } else if (timeLeft <= 60) {
+                        timerElement.style.color = '#ffa726';
+                    }
+                }
+                
+                // 시간 종료 시 게임 오버
+                if (timeLeft <= 0) {
+                    clearInterval(window.gameTimer);
+                    if (game && typeof game.gameOver === 'function') {
+                        game.gameOver();
+                    }
+                }
+            }, 1000);
+        }
+
+        // 40 PLANES 모드 진행률 업데이트
+        function updatePlanesProgress(planesCompleted) {
+            const planesElement = document.getElementById('planes');
+            if (planesElement && planesElement.style.display !== 'none') {
+                planesElement.textContent = `Planes: ${planesCompleted}/40`;
+                
+                // 완료율에 따른 색상 변경
+                const progress = planesCompleted / 40;
+                if (progress >= 1) {
+                    planesElement.style.color = '#4caf50';
+                    planesElement.style.animation = 'blink 0.5s infinite';
+                } else if (progress >= 0.8) {
+                    planesElement.style.color = '#ffa726';
+                } else if (progress >= 0.5) {
+                    planesElement.style.color = '#ffeb3b';
+                }
+            }
+        }
+
+        // 40 PLANES 모드 완료 시간 계산
+        function getPlanesCompletionTime() {
+            if (window.startTime) {
+                const endTime = Date.now();
+                const totalTime = endTime - window.startTime;
+                return Math.floor(totalTime / 1000); // 초 단위
+            }
+            return 0;
+        }
+
         // 랭킹 표시 함수 (전역 함수로 만들기)
         window.showRanking = function() {
             console.log('🏆 랭킹 모달 열기');
-            if (typeof showRankingModal === 'function') {
-                showRankingModal();
-            } else {
-                console.log('랭킹 데이터 로드 중...');
-                // 로컬 랭킹 데이터 표시
-                const rankingData = JSON.parse(localStorage.getItem('tetrisRanking') || '[]');
-                console.log('로컬 랭킹 데이터:', rankingData);
+            
+            // 랭킹 모달이 없으면 생성
+            let rankingModal = document.getElementById('rankingModal');
+            if (!rankingModal) {
+                createRankingModal();
+                rankingModal = document.getElementById('rankingModal');
             }
+            
+            // 랭킹 데이터 로드 및 표시
+            loadAndDisplayRanking();
+            
+            // 모달 표시
+            rankingModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         };
+
+        // 랭킹 모달 생성
+        function createRankingModal() {
+            const modalHTML = `
+                <div id="rankingModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>🏆 RANKING</h2>
+                            <button class="close-btn" onclick="closeRankingModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="ranking-tabs">
+                                <button class="tab-btn active" onclick="switchRankingTab('global')">Global</button>
+                                <button class="tab-btn" onclick="switchRankingTab('personal')">Personal</button>
+                            </div>
+                            <div id="rankingList" class="ranking-list">
+                                <!-- 랭킹 데이터가 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // 모달 외부 클릭 시 닫기
+            document.getElementById('rankingModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRankingModal();
+                }
+            });
+        }
+
+        // 랭킹 모달 닫기
+        function closeRankingModal() {
+            const rankingModal = document.getElementById('rankingModal');
+            if (rankingModal) {
+                rankingModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // 랭킹 탭 전환
+        function switchRankingTab(tab) {
+            // 탭 버튼 활성화 상태 변경
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 랭킹 데이터 다시 로드
+            loadAndDisplayRanking(tab);
+        }
+
+        // 랭킹 데이터 로드 및 표시
+        function loadAndDisplayRanking(tab = 'global') {
+            const rankingList = document.getElementById('rankingList');
+            if (!rankingList) return;
+            
+            let rankingData = [];
+            
+            if (tab === 'global') {
+                // Firebase에서 글로벌 랭킹 로드 (실패 시 로컬 데이터 사용)
+                rankingData = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
+            } else {
+                // 개인 랭킹 로드
+                rankingData = JSON.parse(localStorage.getItem('tetrisPersonalRanking') || '[]');
+            }
+            
+            // 점수순으로 정렬
+            rankingData.sort((a, b) => b.score - a.score);
+            
+            // 랭킹 HTML 생성
+            if (rankingData.length === 0) {
+                rankingList.innerHTML = '<div class="no-data">No ranking data available</div>';
+                return;
+            }
+            
+            let rankingHTML = '';
+            rankingData.forEach((entry, index) => {
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                const date = new Date(entry.date).toLocaleDateString();
+                
+                rankingHTML += `
+                    <div class="ranking-item">
+                        <div class="rank">${medal}</div>
+                        <div class="player-info">
+                            <div class="player-name">${entry.nickname || 'Anonymous'}</div>
+                            <div class="player-date">${date}</div>
+                        </div>
+                        <div class="score">${entry.score.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+            
+            rankingList.innerHTML = rankingHTML;
+        }
+
+        // 게임 오버 시 모드별 결과 처리
+        function handleGameOver(gameMode, finalScore, planesCompleted = 0) {
+            console.log(`게임 오버 - 모드: ${gameMode}, 점수: ${finalScore}, 완성된 판: ${planesCompleted}`);
+            
+            // 타이머 정리
+            if (window.gameTimer) {
+                clearInterval(window.gameTimer);
+                window.gameTimer = null;
+            }
+            
+            let resultMessage = '';
+            let isHighScore = false;
+            
+            switch(gameMode) {
+                case '40planes':
+                    const completionTime = getPlanesCompletionTime();
+                    const minutes = Math.floor(completionTime / 60);
+                    const seconds = completionTime % 60;
+                    
+                    if (planesCompleted >= 40) {
+                        resultMessage = `🎉 40 PLANES 완료!\n완료 시간: ${minutes}:${seconds.toString().padStart(2, '0')}\n최종 점수: ${finalScore}`;
+                        isHighScore = true;
+                    } else {
+                        resultMessage = `40 PLANES 모드 종료\n완성된 판: ${planesCompleted}/40\n완료 시간: ${minutes}:${seconds.toString().padStart(2, '0')}\n점수: ${finalScore}`;
+                    }
+                    break;
+                    
+                case 'blitz':
+                    resultMessage = `BLITZ 모드 종료!\n최종 점수: ${finalScore}`;
+                    isHighScore = true;
+                    break;
+                    
+                case 'zen':
+                    resultMessage = `ZEN 모드 종료!\n최종 점수: ${finalScore}`;
+                    isHighScore = true;
+                    break;
+            }
+            
+            // 게임 오버 모달 표시
+            showGameOverModal(resultMessage, isHighScore);
+            
+            // 랭킹에 점수 저장
+            saveScoreToRanking(gameMode, finalScore, planesCompleted, completionTime);
+        }
+
+        // 점수를 랭킹에 저장
+        function saveScoreToRanking(gameMode, score, planesCompleted = 0, completionTime = 0) {
+            const rankingData = {
+                nickname: '게스트',
+                score: score,
+                mode: gameMode,
+                planesCompleted: planesCompleted,
+                completionTime: completionTime,
+                date: new Date().toISOString()
+            };
+            
+            // 로컬 스토리지에 저장
+            let localRanking = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
+            localRanking.push(rankingData);
+            
+            // 최대 100개 기록만 유지
+            localRanking.sort((a, b) => b.score - a.score);
+            localRanking = localRanking.slice(0, 100);
+            
+            localStorage.setItem('tetrisGlobalRanking', JSON.stringify(localRanking));
+            
+            console.log('점수가 랭킹에 저장되었습니다:', rankingData);
+        }
+
+        // 게임 오버 모달 표시
+        function showGameOverModal(message, isHighScore = false) {
+            let gameOverModal = document.getElementById('gameOverModal');
+            if (!gameOverModal) {
+                const modalHTML = `
+                    <div id="gameOverModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>${isHighScore ? '🎉' : '😔'} GAME OVER</h2>
+                            </div>
+                            <div class="modal-body">
+                                <div class="game-over-message">${message.replace(/\n/g, '<br>')}</div>
+                                ${isHighScore ? '<div class="high-score-notice">🏆 NEW HIGH SCORE!</div>' : ''}
+                            </div>
+                            <div class="modal-buttons">
+                                <button class="btn primary" onclick="restartGame()">다시 시작</button>
+                                <button class="btn secondary" onclick="showRanking()">랭킹 보기</button>
+                                <button class="btn secondary" onclick="goToMenu()">메뉴로</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                gameOverModal = document.getElementById('gameOverModal');
+            }
+            
+            // 메시지 업데이트
+            const messageElement = gameOverModal.querySelector('.game-over-message');
+            if (messageElement) {
+                messageElement.innerHTML = message.replace(/\n/g, '<br>');
+            }
+            
+            // 모달 표시
+            gameOverModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 게임 재시작
+        function restartGame() {
+            const gameOverModal = document.getElementById('gameOverModal');
+            if (gameOverModal) {
+                gameOverModal.style.display = 'none';
+            }
+            document.body.style.overflow = 'auto';
+            
+            // 현재 모드로 다시 시작
+            if (game && game.gameMode) {
+                startGameMode(game.gameMode);
+            }
+        }
+
+        // 메뉴로 돌아가기
+        function goToMenu() {
+            const gameOverModal = document.getElementById('gameOverModal');
+            if (gameOverModal) {
+                gameOverModal.style.display = 'none';
+            }
+            document.body.style.overflow = 'auto';
+            
+            // 게임 상태 초기화
+            gameStarted = false;
+            game = null;
+            
+            // 스플래시 화면 표시
+            document.getElementById('splashScreen').style.display = 'flex';
+            document.getElementById('splashScreen').classList.remove('fade-out');
+        }
 
         // 기존 startGame 함수 수정 (모드 파라미터 추가)
         function startGame(gameMode = 'zen') {
