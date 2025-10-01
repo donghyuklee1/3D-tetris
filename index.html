@@ -2342,71 +2342,32 @@
         window.showRanking = function() {
             console.log('🏆 랭킹 모달 열기');
             
-            // 랭킹 모달이 없으면 생성
-            let rankingModal = document.getElementById('rankingModal');
+            // 기존 랭킹 모달 사용
+            const rankingModal = document.getElementById('rankingModal');
             if (!rankingModal) {
-                createRankingModal();
-                rankingModal = document.getElementById('rankingModal');
+                console.error('랭킹 모달을 찾을 수 없습니다!');
+                return;
             }
             
             // 랭킹 데이터 로드 및 표시
-            loadAndDisplayRanking();
+            if (game && typeof game.loadRanking === 'function') {
+                game.loadRanking();
+            } else {
+                loadAndDisplayRanking();
+            }
             
             // 모달 표시
-            rankingModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            rankingModal.classList.add('show');
         };
 
-        // 랭킹 모달 생성
-        function createRankingModal() {
-            const modalHTML = `
-                <div id="rankingModal" class="modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2>🏆 RANKING</h2>
-                            <button class="close-btn" onclick="closeRankingModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="ranking-tabs">
-                                <button class="tab-btn active" onclick="switchRankingTab('global')">Global</button>
-                                <button class="tab-btn" onclick="switchRankingTab('personal')">Personal</button>
-                            </div>
-                            <div id="rankingList" class="ranking-list">
-                                <!-- 랭킹 데이터가 여기에 표시됩니다 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // 모달 외부 클릭 시 닫기
-            document.getElementById('rankingModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeRankingModal();
-                }
-            });
-        }
-
         // 랭킹 모달 닫기
-        function closeRankingModal() {
+        window.hideRanking = function() {
             const rankingModal = document.getElementById('rankingModal');
             if (rankingModal) {
-                rankingModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                rankingModal.classList.remove('show');
             }
-        }
+        };
 
-        // 랭킹 탭 전환
-        function switchRankingTab(tab) {
-            // 탭 버튼 활성화 상태 변경
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // 랭킹 데이터 다시 로드
-            loadAndDisplayRanking(tab);
-        }
 
         // 랭킹 데이터 로드 및 표시
         function loadAndDisplayRanking(tab = 'global') {
@@ -2522,64 +2483,53 @@
             console.log('점수가 랭킹에 저장되었습니다:', rankingData);
         }
 
-        // 게임 오버 모달 표시
+        // 게임 오버 모달 표시 (기존 모달 사용)
         function showGameOverModal(message, isHighScore = false) {
-            let gameOverModal = document.getElementById('gameOverModal');
+            const gameOverModal = document.getElementById('gameOverModal');
             if (!gameOverModal) {
-                const modalHTML = `
-                    <div id="gameOverModal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2>${isHighScore ? '🎉' : '😔'} GAME OVER</h2>
-                            </div>
-                            <div class="modal-body">
-                                <div class="game-over-message">${message.replace(/\n/g, '<br>')}</div>
-                                ${isHighScore ? '<div class="high-score-notice">🏆 NEW HIGH SCORE!</div>' : ''}
-                            </div>
-                            <div class="modal-buttons">
-                                <button class="btn primary" onclick="restartGame()">다시 시작</button>
-                                <button class="btn secondary" onclick="showRanking()">랭킹 보기</button>
-                                <button class="btn secondary" onclick="goToMenu()">메뉴로</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
-                gameOverModal = document.getElementById('gameOverModal');
+                console.error('게임 오버 모달을 찾을 수 없습니다!');
+                return;
             }
             
             // 메시지 업데이트
-            const messageElement = gameOverModal.querySelector('.game-over-message');
-            if (messageElement) {
-                messageElement.innerHTML = message.replace(/\n/g, '<br>');
+            const titleElement = gameOverModal.querySelector('h2');
+            const scoreElement = document.getElementById('finalScore');
+            
+            if (titleElement) {
+                titleElement.textContent = isHighScore ? '🎉 GAME OVER' : '😔 GAME OVER';
+            }
+            
+            if (scoreElement) {
+                scoreElement.textContent = message.includes('점수:') ? 
+                    message.match(/점수: (\d+)/)?.[1] || '0' : '0';
             }
             
             // 모달 표시
-            gameOverModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            gameOverModal.classList.add('show');
         }
 
-        // 게임 재시작
-        function restartGame() {
+        // 게임 재시작 (전역 함수)
+        window.restartGame = function() {
             const gameOverModal = document.getElementById('gameOverModal');
             if (gameOverModal) {
-                gameOverModal.style.display = 'none';
+                gameOverModal.classList.remove('show');
             }
-            document.body.style.overflow = 'auto';
             
             // 현재 모드로 다시 시작
             if (game && game.gameMode) {
                 startGameMode(game.gameMode);
+            } else {
+                // 기본적으로 ZEN 모드로 시작
+                startGameMode('zen');
             }
-        }
+        };
 
-        // 메뉴로 돌아가기
-        function goToMenu() {
+        // 메뉴로 돌아가기 (전역 함수)
+        window.goToMenu = function() {
             const gameOverModal = document.getElementById('gameOverModal');
             if (gameOverModal) {
-                gameOverModal.style.display = 'none';
+                gameOverModal.classList.remove('show');
             }
-            document.body.style.overflow = 'auto';
             
             // 게임 상태 초기화
             gameStarted = false;
@@ -2588,7 +2538,12 @@
             // 스플래시 화면 표시
             document.getElementById('splashScreen').style.display = 'flex';
             document.getElementById('splashScreen').classList.remove('fade-out');
-        }
+        };
+
+        // 스플래시 화면으로 돌아가기 (showSplash 함수)
+        window.showSplash = function() {
+            goToMenu();
+        };
 
         // 기존 startGame 함수 수정 (모드 파라미터 추가)
         function startGame(gameMode = 'zen') {
@@ -2630,8 +2585,7 @@
                             displayName: '게스트'
                         };
                         
-                        // 모바일 컨트롤 가이드 표시
-                        showMobileControlsIfNeeded();
+                        // 게임 시작 완료
                         
                         console.log(`${gameMode} 모드 게임 시작 완료!`);
                     }
@@ -2651,5 +2605,4 @@
         }
     </script>
 </body>
-</html>
 </html>
