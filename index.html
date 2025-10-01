@@ -667,6 +667,45 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
+        /* 잠금된 버튼 스타일 */
+        .mode-btn.locked {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+            cursor: not-allowed !important;
+            pointer-events: auto !important;
+        }
+
+        .mode-btn.locked:hover {
+            transform: none !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+            background: rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .mode-btn.locked .mode-icon {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .mode-btn.locked .mode-title {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .mode-btn.locked .mode-desc {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        /* 잠금 애니메이션 */
+        @keyframes lockShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .mode-btn.locked.shake {
+            animation: lockShake 0.5s ease-in-out;
+        }
+
         .mode-icon {
             width: 60px;
             height: 60px;
@@ -1170,55 +1209,10 @@
             transform: scale(0.95);
         }
 
-        /* 모바일 컨트롤 가이드 */
-        .mobile-controls-guide {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 15px;
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none; /* 기본적으로 숨김 */
-        }
 
-        .control-guide-title {
-            color: #4ecdc4;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-        }
 
-        .control-guide-items {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
 
-        .control-guide-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.8rem;
-        }
 
-        .control-icon {
-            font-size: 1rem;
-            min-width: 20px;
-        }
-
-        /* 데스크톱에서는 모바일 가이드 숨김 */
-        @media (min-width: 769px) {
-            .mobile-controls-guide {
-                display: none !important;
-            }
-        }
-
-        /* 모바일에서만 모바일 가이드 표시 */
         @media (max-width: 768px) {
             .mobile-controls-guide {
                 display: block;
@@ -1714,18 +1708,18 @@
             <div class="splash-text">PC version</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
-                <button class="mode-btn mode-40" onclick="startGameMode('40planes')" data-mode="40planes">
+                <button class="mode-btn mode-40 locked" onclick="showLockedAnimation(this)" data-mode="40planes">
                     <div class="mode-icon">40P</div>
                     <div class="mode-info">
-                        <div class="mode-title">40 PLANES</div>
-                        <div class="mode-desc">COMPLETE 40 FULL PLANES AS QUICKLY AS POSSIBLE</div>
+                        <div class="mode-title">40 PLANES 🔓</div>
+                        <div class="mode-desc">COMING SOON - COMPLETE 40 FULL PLANES</div>
                     </div>
                 </button>
-                <button class="mode-btn mode-blitz" onclick="startGameMode('blitz')" data-mode="blitz">
+                <button class="mode-btn mode-blitz locked" onclick="showLockedAnimation(this)" data-mode="blitz">
                     <div class="mode-icon">BLZ</div>
                     <div class="mode-info">
-                        <div class="mode-title">BLITZ</div>
-                        <div class="mode-desc">A TWO-MINUTE RACE AGAINST THE CLOCK</div>
+                        <div class="mode-title">BLITZ 🔓</div>
+                        <div class="mode-desc">COMING SOON - TWO-MINUTE RACE</div>
                     </div>
                 </button>
                 <button class="mode-btn mode-zen" onclick="startGameMode('zen')" data-mode="zen">
@@ -1788,32 +1782,6 @@
                     <button class="control-btn" onclick="togglePause()">일시정지</button>
                 </div>
                 
-                <!-- 모바일 컨트롤 가이드 -->
-                <div class="mobile-controls-guide" id="mobileControlsGuide">
-                    <div class="control-guide-title">📱 모바일 컨트롤</div>
-                    <div class="control-guide-items">
-                <div class="control-guide-item">
-                    <span class="control-icon">👆</span>
-                    <span>탭: Z축 회전 (X-Y 평면 회전)</span>
-                </div>
-                <div class="control-guide-item">
-                    <span class="control-icon">👆👆</span>
-                    <span>더블탭: Z축 회전 (X-Y 평면 회전)</span>
-                </div>
-                <div class="control-guide-item">
-                    <span class="control-icon">👈👉</span>
-                    <span>좌우스와이프: Y축 회전 (X-Z 평면 회전)</span>
-                </div>
-                <div class="control-guide-item">
-                    <span class="control-icon">⬆️⬇️</span>
-                    <span>상하스와이프: X축 회전 (Z축 중심 회전)</span>
-                </div>
-                <div class="control-guide-item">
-                    <span class="control-icon">⏱️</span>
-                    <span>길게누르기: 빠른낙하</span>
-                </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -2076,19 +2044,6 @@
 
 
 
-        // 모바일 감지 및 컨트롤 가이드 표시
-        function showMobileControlsIfNeeded() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                           window.innerWidth <= 768;
-            
-            const mobileGuide = document.getElementById('mobileControlsGuide');
-            if (mobileGuide && isMobile) {
-                mobileGuide.style.display = 'block';
-                console.log('모바일 디바이스 감지 - 컨트롤 가이드 표시');
-            } else if (mobileGuide) {
-                mobileGuide.style.display = 'none';
-            }
-        }
 
         // 페이지 로드 시 디버깅 정보
         window.addEventListener('load', () => {
@@ -2104,8 +2059,6 @@
                 console.log('Three.js 버전:', THREE.REVISION);
             }
             
-            // 모바일 컨트롤 가이드 표시
-            showMobileControlsIfNeeded();
             
             // 버튼 확인 로그
             setTimeout(() => {
@@ -2121,10 +2074,6 @@
             }, 100);
         });
 
-        // 창 크기 변경 시 모바일 감지
-        window.addEventListener('resize', () => {
-            showMobileControlsIfNeeded();
-        });
 
         // 즉시 실행되는 전역 이벤트 리스너
         function setupButtonListeners() {
@@ -2188,6 +2137,75 @@
 
         // 즉시 실행
         setupButtonListeners();
+
+        // 잠금된 버튼 애니메이션
+        window.showLockedAnimation = function(button) {
+            console.log('🔒 잠금된 모드 클릭됨');
+            button.classList.add('shake');
+            
+            // 애니메이션 완료 후 클래스 제거
+            setTimeout(() => {
+                button.classList.remove('shake');
+            }, 500);
+            
+            // 잠금 메시지 표시
+            showLockedMessage(button);
+        };
+
+        // 잠금 메시지 표시
+        function showLockedMessage(button) {
+            const mode = button.getAttribute('data-mode');
+            let message = '';
+            
+            switch(mode) {
+                case '40planes':
+                    message = '🚧 40 PLANES 모드는 아직 개발 중입니다!\n곧 출시될 예정이니 기다려주세요!';
+                    break;
+                case 'blitz':
+                    message = '🚧 BLITZ 모드는 아직 개발 중입니다!\n곧 출시될 예정이니 기다려주세요!';
+                    break;
+            }
+            
+            // 임시 알림 표시
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 15px;
+                border: 2px solid #ff6b6b;
+                z-index: 10000;
+                text-align: center;
+                font-size: 1.1em;
+                line-height: 1.5;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            notification.textContent = message.replace(/\n/g, '\n');
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 2000);
+        }
+
+        // 페이드 인/아웃 애니메이션 추가
+        const fadeInOutStyle = document.createElement('style');
+        fadeInOutStyle.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(fadeInOutStyle);
 
         // 게임 모드 시작 함수 (전역 함수로 만들기)
         window.startGameMode = function(mode) {
