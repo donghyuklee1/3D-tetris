@@ -2101,14 +2101,29 @@
             
             // 게임 초기화
             try {
-                if (!gameStarted && typeof Tetris3D !== 'undefined') {
-                    game = new Tetris3D();
-                    game.gameMode = 'zen';
-                    gameStarted = true;
-                    console.log('🎮 게임 시작 완료!');
-                } else if (typeof Tetris3D === 'undefined') {
-                    console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
-                    alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
+                console.log('게임 상태 확인:', { gameStarted, hasTetris3D: typeof Tetris3D !== 'undefined' });
+                
+                if (!gameStarted) {
+                    if (typeof Tetris3D !== 'undefined') {
+                        console.log('Tetris3D 클래스 발견, 게임 인스턴스 생성 중...');
+                        game = new Tetris3D();
+                        game.gameMode = 'zen';
+                        gameStarted = true;
+                        console.log('🎮 게임 시작 완료!');
+                    } else {
+                        console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
+                        alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
+                        // 3초 후 다시 시도
+                        setTimeout(() => {
+                            if (typeof Tetris3D !== 'undefined') {
+                                console.log('재시도: 게임 시작');
+                                game = new Tetris3D();
+                                game.gameMode = 'zen';
+                                gameStarted = true;
+                                console.log('🎮 게임 시작 완료! (재시도)');
+                            }
+                        }, 3000);
+                    }
                 } else {
                     console.log('⚠️ 게임이 이미 시작되었습니다');
                 }
@@ -2160,6 +2175,14 @@
             } else {
                 console.error('❌ Tetris3D 클래스가 정의되지 않음');
             }
+        };
+        
+        // ZEN 게임 강제 시작 함수 (테스트용)
+        window.forceStartGame = function() {
+            console.log('🚀 강제 게임 시작');
+            gameStarted = false;
+            game = null;
+            startZenGame();
         };
 
         // 페이드 인/아웃 애니메이션 추가
