@@ -1723,7 +1723,7 @@
                         <div class="mode-desc">COMING SOON - TWO-MINUTE RACE</div>
                     </div>
                 </button>
-                <button class="mode-btn mode-zen" data-mode="zen">
+                <button class="mode-btn mode-zen" data-mode="zen" onclick="startZenGame()">
                     <div class="mode-icon">ZEN</div>
                     <div class="mode-info">
                         <div class="mode-title">ZEN</div>
@@ -2076,262 +2076,32 @@
         });
 
 
-        // 간단한 버튼 시스템
-        console.log('🚀 새로운 버튼 시스템 초기화');
-
-        // 스크립트 로드 상태 확인 함수
-        function checkScriptStatus() {
-            console.log('📋 스크립트 로드 상태 확인:');
-            console.log('- THREE:', typeof THREE !== 'undefined' ? '✅ 로드됨' : '❌ 로드되지 않음');
-            console.log('- Tetris3D:', typeof Tetris3D !== 'undefined' ? '✅ 로드됨' : '❌ 로드되지 않음');
-            console.log('- document.readyState:', document.readyState);
-        }
-
-        // 새로운 간단한 버튼 시스템 시작
-
-        // ZEN 게임 시작 함수
-        function startZenGame() {
+        // ZEN 게임 시작 함수 (전역 함수)
+        window.startZenGame = function() {
             console.log('🎮 ZEN 게임 시작');
             
-            // 스플래시 화면 숨기기 (페이드 아웃 효과)
+            // 스플래시 화면 숨기기
             const splashScreen = document.getElementById('splashScreen');
             if (splashScreen) {
-                splashScreen.style.transition = 'opacity 0.5s ease-out';
-                splashScreen.style.opacity = '0';
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 500);
-            }
-            
-            // 로딩 화면 표시
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.style.display = 'block';
-                loading.style.opacity = '1';
+                splashScreen.style.display = 'none';
             }
             
             // 게임 초기화
-            setTimeout(() => {
-                try {
-                    console.log('게임 상태 확인:', { 
-                        gameStarted, 
-                        hasTetris3D: typeof Tetris3D !== 'undefined',
-                        hasTHREE: typeof THREE !== 'undefined'
-                    });
-                    
-                    if (!gameStarted) {
-                        if (typeof THREE === 'undefined') {
-                            throw new Error('Three.js가 로드되지 않았습니다!');
-                        }
-                        
-                        if (typeof Tetris3D !== 'undefined') {
-                            console.log('Tetris3D 클래스 발견, 게임 인스턴스 생성 중...');
-                            
-                            // Canvas 요소 확인
-                            const canvas = document.getElementById('gameCanvas');
-                            if (!canvas) {
-                                throw new Error('Canvas 요소를 찾을 수 없습니다!');
-                            }
-                            
-                            // 게임 인스턴스 생성
-                            game = new Tetris3D();
-                            game.gameMode = 'zen';
-                            gameStarted = true;
-                            
-                            // 로딩 화면 숨기기
-                            if (loading) {
-                                loading.style.display = 'none';
-                            }
-                            
-                            console.log('🎮 게임 시작 완료!');
-                            
-                        } else {
-                            console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
-                            
-                            // 로딩 화면 숨기기
-                            if (loading) {
-                                loading.style.display = 'none';
-                            }
-                            
-                            alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
-                            
-                            // 3초 후 다시 시도
-                            setTimeout(() => {
-                                if (typeof Tetris3D !== 'undefined') {
-                                    console.log('재시도: 게임 시작');
-                                    try {
-                                        game = new Tetris3D();
-                                        game.gameMode = 'zen';
-                                        gameStarted = true;
-                                        console.log('🎮 게임 시작 완료! (재시도)');
-                                    } catch (retryError) {
-                                        console.error('❌ 재시도 실패:', retryError);
-                                        alert('게임 시작에 실패했습니다: ' + retryError.message);
-                                    }
-                                } else {
-                                    console.error('❌ 재시도 시에도 Tetris3D 클래스를 찾을 수 없음');
-                                    alert('게임 로딩에 문제가 있습니다. 페이지를 새로고침해주세요.');
-                                }
-                            }, 3000);
-                        }
-                    } else {
-                        console.log('⚠️ 게임이 이미 시작되었습니다');
-                        if (loading) {
-                            loading.style.display = 'none';
-                        }
-                    }
-                } catch (error) {
-                    console.error('❌ 게임 시작 중 오류:', error);
-                    
-                    // 로딩 화면 숨기기
-                    if (loading) {
-                        loading.style.display = 'none';
-                    }
-                    
-                    alert('게임 시작 중 오류가 발생했습니다: ' + error.message);
-                    
-                    // 스플래시 화면 다시 표시
-                    if (splashScreen) {
-                        splashScreen.style.display = 'flex';
-                        splashScreen.style.opacity = '1';
-                    }
-                }
-            }, 300);
-        }
-
-        // 간단한 버튼 초기화
-        function simpleInitializeButtons() {
-            console.log('🔧 간단한 버튼 초기화 시작');
-            
-            // ZEN 버튼 찾기
-            const zenBtn = document.querySelector('.mode-zen');
-            console.log('ZEN 버튼 요소:', zenBtn);
-            
-            if (zenBtn) {
-                // 기존 이벤트 리스너 제거 (중복 방지)
-                zenBtn.removeEventListener('click', handleZenClick);
-                
-                // 클릭 핸들러 함수 정의
-                function handleZenClick(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🎮 ZEN 버튼 클릭됨 - 게임 시작');
-                    
-                    // 클릭 시각적 효과
-                    zenBtn.style.transform = 'scale(0.95)';
-                    zenBtn.style.transition = 'transform 0.1s ease';
-                    
-                    setTimeout(() => {
-                        zenBtn.style.transform = 'scale(1)';
-                    }, 100);
-                    
-                    // 게임 시작
-                    console.log('startZenGame 함수 호출 중...');
-                    startZenGame();
-                }
-                
-                // 클릭 이벤트 등록 (여러 방법으로)
-                zenBtn.addEventListener('click', handleZenClick);
-                
-                // onclick 속성도 추가 (백업용)
-                zenBtn.onclick = handleZenClick;
-                
-                // 호버 효과 추가
-                zenBtn.addEventListener('mouseenter', () => {
-                    zenBtn.style.transform = 'translateY(-3px) scale(1.02)';
-                    zenBtn.style.transition = 'transform 0.3s ease';
-                });
-                
-                zenBtn.addEventListener('mouseleave', () => {
-                    zenBtn.style.transform = 'translateY(0) scale(1)';
-                });
-                
-                console.log('✅ ZEN 버튼 등록 완료 (클릭 + 호버 효과 포함)');
-                
-                // 테스트용: 버튼 클릭 가능 여부 확인
-                console.log('버튼 스타일:', window.getComputedStyle(zenBtn).pointerEvents);
-                console.log('버튼 클릭 가능:', zenBtn.onclick !== null || zenBtn.hasAttribute('onclick'));
-                
-            } else {
-                console.error('❌ ZEN 버튼을 찾을 수 없습니다');
-                console.log('사용 가능한 버튼들:', document.querySelectorAll('button, .mode-btn'));
-            }
-        }
-
-        // DOM 로드 완료 후 간단한 버튼 초기화
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', simpleInitializeButtons);
-        } else {
-            simpleInitializeButtons();
-        }
-
-        // 전역 함수로 스크립트 상태 확인 가능
-        window.checkScriptStatus = checkScriptStatus;
-        window.testTetris3D = function() {
-            console.log('🧪 Tetris3D 테스트 시작');
-            checkScriptStatus();
-            if (typeof Tetris3D !== 'undefined') {
-                console.log('✅ Tetris3D 클래스 사용 가능');
-                try {
-                    const testInstance = new Tetris3D();
-                    console.log('✅ Tetris3D 인스턴스 생성 성공:', testInstance);
-                } catch (error) {
-                    console.error('❌ Tetris3D 인스턴스 생성 실패:', error);
-                }
-            } else {
-                console.error('❌ Tetris3D 클래스가 정의되지 않음');
-            }
-        };
-        
-        // ZEN 게임 강제 시작 함수 (테스트용)
-        window.forceStartGame = function() {
-            console.log('🚀 강제 게임 시작');
-            gameStarted = false;
-            game = null;
-            startZenGame();
-        };
-        
-        // 직접 게임 시작 함수 (디버깅용)
-        window.directStartGame = function() {
-            console.log('🎯 직접 게임 시작');
             try {
-                if (typeof Tetris3D !== 'undefined') {
+                if (!gameStarted && typeof Tetris3D !== 'undefined') {
                     game = new Tetris3D();
                     game.gameMode = 'zen';
                     gameStarted = true;
-                    console.log('✅ 직접 게임 시작 성공!');
-                    
-                    // 스플래시 화면 숨기기
-                    const splashScreen = document.getElementById('splashScreen');
-                    if (splashScreen) {
-                        splashScreen.style.display = 'none';
-                    }
+                    console.log('🎮 게임 시작 완료!');
+                } else if (typeof Tetris3D === 'undefined') {
+                    console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
+                    alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
                 } else {
-                    console.error('❌ Tetris3D 클래스가 없습니다');
+                    console.log('⚠️ 게임이 이미 시작되었습니다');
                 }
             } catch (error) {
-                console.error('❌ 직접 게임 시작 실패:', error);
-            }
-        };
-        
-        // ZEN 버튼 클릭 테스트 함수
-        window.testZenButton = function() {
-            console.log('🧪 ZEN 버튼 테스트');
-            const zenBtn = document.querySelector('.mode-zen');
-            if (zenBtn) {
-                console.log('ZEN 버튼 발견:', zenBtn);
-                console.log('버튼 클릭 가능:', window.getComputedStyle(zenBtn).pointerEvents);
-                
-                // 강제 클릭 이벤트 발생
-                const clickEvent = new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: true,
-                    view: window
-                });
-                zenBtn.dispatchEvent(clickEvent);
-                console.log('클릭 이벤트 발생시킴');
-            } else {
-                console.error('ZEN 버튼을 찾을 수 없습니다');
+                console.error('❌ 게임 시작 중 오류:', error);
+                alert('게임 시작 중 오류가 발생했습니다: ' + error.message);
             }
         };
 
