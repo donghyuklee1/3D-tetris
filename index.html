@@ -1723,7 +1723,7 @@
                         <div class="mode-desc">COMING SOON - TWO-MINUTE RACE</div>
                     </div>
                 </button>
-                <button class="mode-btn mode-zen" data-mode="zen" onclick="startZenGame()">
+                <button class="mode-btn mode-zen" data-mode="zen" onclick="startZenGame(); testButton();">
                     <div class="mode-icon">ZEN</div>
                     <div class="mode-info">
                         <div class="mode-title">ZEN</div>
@@ -2077,32 +2077,30 @@
 
 
         // ZEN 게임 시작 함수 (전역 함수)
-        window.startZenGame = function() {
-            console.log('🎮 ZEN 게임 시작');
+        function startZenGame() {
+            console.log('🎮 ZEN 버튼 클릭됨!');
+            alert('ZEN 버튼이 클릭되었습니다!'); // 테스트용
             
             // 스플래시 화면 숨기기
-            const splashScreen = document.getElementById('splashScreen');
-            if (splashScreen) {
-                splashScreen.style.display = 'none';
-            }
+            document.getElementById('splashScreen').style.display = 'none';
             
-            // 게임 초기화
-            try {
-                if (!gameStarted && typeof Tetris3D !== 'undefined') {
-                    game = new Tetris3D();
-                    game.gameMode = 'zen';
-                    gameStarted = true;
-                    console.log('🎮 게임 시작 완료!');
-                } else if (typeof Tetris3D === 'undefined') {
-                    console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
-                    alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
-                } else {
-                    console.log('⚠️ 게임이 이미 시작되었습니다');
-                }
-            } catch (error) {
-                console.error('❌ 게임 시작 중 오류:', error);
-                alert('게임 시작 중 오류가 발생했습니다: ' + error.message);
+            // 게임 시작
+            if (typeof Tetris3D !== 'undefined') {
+                console.log('게임 시작 중...');
+                game = new Tetris3D();
+                game.gameMode = 'zen';
+                gameStarted = true;
+                console.log('🎮 게임 시작 완료!');
+            } else {
+                console.error('Tetris3D 클래스가 로드되지 않았습니다');
+                alert('게임을 로드하는 중입니다. 페이지를 새로고침해주세요.');
             }
+        }
+        
+        // 테스트용 전역 함수
+        window.testButton = function() {
+            console.log('테스트 함수 호출됨');
+            alert('테스트 함수가 호출되었습니다!');
         };
 
         // 페이드 인/아웃 애니메이션 추가
@@ -2204,8 +2202,13 @@
             game = null;
             
             // 스플래시 화면 표시
-            document.getElementById('splashScreen').style.display = 'flex';
-            document.getElementById('splashScreen').classList.remove('fade-out');
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) {
+                splashScreen.style.display = 'flex';
+                splashScreen.style.zIndex = '1000';
+                splashScreen.style.opacity = '1';
+                splashScreen.classList.remove('fade-out');
+            }
         };
 
         // 스플래시 화면으로 돌아가기 (showSplash 함수)
