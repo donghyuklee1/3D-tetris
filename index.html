@@ -785,32 +785,74 @@
 
         .mode-zen {
             border-color: rgba(138, 43, 226, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .mode-zen:hover {
             border-color: rgba(138, 43, 226, 0.8);
             box-shadow: 0 8px 25px rgba(138, 43, 226, 0.3);
             background: rgba(138, 43, 226, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
         }
 
         .mode-zen:hover .mode-icon {
             background: linear-gradient(135deg, #9a3be2, #a932dc);
             box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+            transform: scale(1.05);
+        }
+
+        .mode-zen:hover .mode-title {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        }
+
+        .mode-zen:hover .mode-desc {
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .mode-zen:active {
-            transform: scale(0.95);
+            transform: scale(0.95) translateY(0);
             transition: transform 0.1s ease;
         }
 
         .mode-zen:active .mode-icon {
             background: linear-gradient(135deg, #7a1be2, #8932cc);
             box-shadow: 0 2px 10px rgba(138, 43, 226, 0.6);
+            transform: scale(0.95);
         }
 
         .mode-zen .mode-icon {
             background: linear-gradient(135deg, #8a2be2, #9932cc);
             transition: all 0.3s ease;
+        }
+
+        .mode-zen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mode-zen:hover::before {
+            left: 100%;
+        }
+
+        /* ZEN 버튼 펄스 효과 */
+        @keyframes zenPulse {
+            0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(138, 43, 226, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0); }
+        }
+
+        .mode-zen.pulse {
+            animation: zenPulse 0.6s ease-out;
         }
 
 
@@ -2088,19 +2130,38 @@
 
         // ZEN 게임 시작 함수
         function startZenGame() {
-            // 버튼 클릭 효과
+            // 버튼 클릭 효과 (향상된 모달 효과)
             const zenBtn = document.querySelector('.mode-zen');
             if (zenBtn) {
-                zenBtn.style.transform = 'scale(0.95)';
-                zenBtn.style.transition = 'transform 0.1s ease';
+                // 펄스 효과 추가
+                zenBtn.classList.add('pulse');
+                
+                // 클릭 시 강한 효과
+                zenBtn.style.transform = 'scale(0.9)';
+                zenBtn.style.filter = 'brightness(1.2)';
+                zenBtn.style.transition = 'all 0.2s ease';
+                
+                // 립플 효과 추가
+                zenBtn.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.8)';
                 
                 setTimeout(() => {
                     zenBtn.style.transform = 'scale(1)';
-                }, 100);
+                    zenBtn.style.filter = 'brightness(1)';
+                    zenBtn.style.boxShadow = '';
+                    zenBtn.classList.remove('pulse');
+                }, 600);
             }
             
-            // 스플래시 화면 숨기기
-            document.getElementById('splashScreen').style.display = 'none';
+            // 스플래시 화면 페이드 아웃 효과
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) {
+                splashScreen.style.transition = 'opacity 0.5s ease-out';
+                splashScreen.style.opacity = '0';
+                
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
+            }
             
             // 게임 시작
             if (typeof Tetris3D !== 'undefined') {
