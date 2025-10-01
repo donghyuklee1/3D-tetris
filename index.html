@@ -2079,6 +2079,14 @@
         // 간단한 버튼 시스템
         console.log('🚀 새로운 버튼 시스템 초기화');
 
+        // 스크립트 로드 상태 확인 함수
+        function checkScriptStatus() {
+            console.log('📋 스크립트 로드 상태 확인:');
+            console.log('- THREE:', typeof THREE !== 'undefined' ? '✅ 로드됨' : '❌ 로드되지 않음');
+            console.log('- Tetris3D:', typeof Tetris3D !== 'undefined' ? '✅ 로드됨' : '❌ 로드되지 않음');
+            console.log('- document.readyState:', document.readyState);
+        }
+
         // 새로운 간단한 버튼 시스템 시작
 
         // 간단한 버튼 이벤트 처리 함수들
@@ -2115,12 +2123,18 @@
                             throw new Error('Three.js가 로드되지 않았습니다!');
                         }
                         
+                        // Tetris3D 클래스 로드 확인
+                        if (typeof Tetris3D === 'undefined') {
+                            throw new Error('Tetris3D 클래스가 로드되지 않았습니다! game.js 파일을 확인해주세요.');
+                        }
+                        
                         // Canvas 요소 확인
                         const canvas = document.getElementById('gameCanvas');
                         if (!canvas) {
                             throw new Error('Canvas 요소를 찾을 수 없습니다!');
                         }
                         
+                        console.log('Tetris3D 클래스 확인됨, 게임 인스턴스 생성 중...');
                         game = new Tetris3D();
                         game.gameMode = 'zen';
                         gameStarted = true;
@@ -2295,12 +2309,44 @@
             console.log('🎉 모든 버튼 초기화 완료!');
         }
 
-        // DOM 로드 완료 후 버튼 초기화
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeButtons);
-        } else {
-            initializeButtons();
+        // 모든 스크립트가 로드된 후 버튼 초기화
+        function waitForScriptsAndInitialize() {
+            checkScriptStatus();
+            
+            // 모든 필요한 스크립트가 로드되었는지 확인
+            if (typeof THREE !== 'undefined' && typeof Tetris3D !== 'undefined') {
+                console.log('✅ 모든 스크립트 로드 완료');
+                initializeButtons();
+            } else {
+                console.log('⏳ 스크립트 로딩 대기 중...');
+                setTimeout(waitForScriptsAndInitialize, 100);
+            }
         }
+
+        // DOM 로드 완료 후 스크립트 확인 및 버튼 초기화
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', waitForScriptsAndInitialize);
+        } else {
+            waitForScriptsAndInitialize();
+        }
+
+        // 전역 함수로 스크립트 상태 확인 가능
+        window.checkScriptStatus = checkScriptStatus;
+        window.testTetris3D = function() {
+            console.log('🧪 Tetris3D 테스트 시작');
+            checkScriptStatus();
+            if (typeof Tetris3D !== 'undefined') {
+                console.log('✅ Tetris3D 클래스 사용 가능');
+                try {
+                    const testInstance = new Tetris3D();
+                    console.log('✅ Tetris3D 인스턴스 생성 성공:', testInstance);
+                } catch (error) {
+                    console.error('❌ Tetris3D 인스턴스 생성 실패:', error);
+                }
+            } else {
+                console.error('❌ Tetris3D 클래스가 정의되지 않음');
+            }
+        };
 
         // 페이드 인/아웃 애니메이션 추가
         const fadeInOutStyle = document.createElement('style');
