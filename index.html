@@ -2089,177 +2089,38 @@
 
         // 새로운 간단한 버튼 시스템 시작
 
-        // 간단한 버튼 이벤트 처리 함수들
+        // 간단한 ZEN 게임 시작 함수
         function startZenGame() {
             console.log('🎮 ZEN 게임 시작');
             
             // 스플래시 화면 숨기기
             const splashScreen = document.getElementById('splashScreen');
             if (splashScreen) {
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 500);
-            }
-            
-            // 로딩 화면 표시
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.style.display = 'block';
+                splashScreen.style.display = 'none';
             }
             
             // 게임 초기화
-            setTimeout(() => {
-                try {
-                    if (loading) {
-                        loading.style.display = 'none';
-                    }
-                    
-                    if (!gameStarted) {
-                        console.log('Tetris3D 인스턴스 생성 중...');
-                        
-                        // Three.js 로드 확인
-                        if (typeof THREE === 'undefined') {
-                            throw new Error('Three.js가 로드되지 않았습니다!');
-                        }
-                        
-                        // Tetris3D 클래스 로드 확인
-                        if (typeof Tetris3D === 'undefined') {
-                            throw new Error('Tetris3D 클래스가 로드되지 않았습니다! game.js 파일을 확인해주세요.');
-                        }
-                        
-                        // Canvas 요소 확인
-                        const canvas = document.getElementById('gameCanvas');
-                        if (!canvas) {
-                            throw new Error('Canvas 요소를 찾을 수 없습니다!');
-                        }
-                        
-                        console.log('Tetris3D 클래스 확인됨, 게임 인스턴스 생성 중...');
-                        game = new Tetris3D();
-                        game.gameMode = 'zen';
-                        gameStarted = true;
-                        
-                        console.log('🎮 ZEN 게임 시작 완료!');
-                    }
-                } catch (error) {
-                    console.error('게임 시작 중 오류 발생:', error);
-                    if (loading) {
-                        loading.innerHTML = '<div class="spinner"></div><div>오류 발생: ' + error.message + '</div>';
-                    }
-                    
-                    setTimeout(() => {
-                        if (loading) {
-                            loading.style.display = 'none';
-                        }
-                        if (splashScreen) {
-                            splashScreen.style.display = 'flex';
-                            splashScreen.classList.remove('fade-out');
-                        }
-                    }, 3000);
+            try {
+                if (!gameStarted && typeof Tetris3D !== 'undefined') {
+                    game = new Tetris3D();
+                    game.gameMode = 'zen';
+                    gameStarted = true;
+                    console.log('🎮 게임 시작 완료!');
+                } else if (typeof Tetris3D === 'undefined') {
+                    console.error('❌ Tetris3D 클래스가 로드되지 않았습니다');
+                    alert('게임을 로드하는 중입니다. 잠시 후 다시 시도해주세요.');
+                } else {
+                    console.log('⚠️ 게임이 이미 시작되었습니다');
                 }
-            }, 500);
+            } catch (error) {
+                console.error('❌ 게임 시작 중 오류:', error);
+                alert('게임 시작 중 오류가 발생했습니다: ' + error.message);
+            }
         }
 
-        function openRanking() {
-            console.log('🏆 랭킹 열기');
-            
-            const rankingModal = document.getElementById('rankingModal');
-            if (!rankingModal) {
-                console.error('랭킹 모달을 찾을 수 없습니다!');
-                return;
-            }
-            
-            // 랭킹 데이터 로드
-            loadRankingData();
-            
-            // 모달 표시
-            rankingModal.classList.add('show');
-        }
-
-        function loadRankingData() {
-            const rankingList = document.getElementById('rankingList');
-            if (!rankingList) {
-                console.error('랭킹 리스트를 찾을 수 없습니다!');
-                return;
-            }
-            
-            // 로컬 스토리지에서 랭킹 데이터 로드
-            const rankingData = JSON.parse(localStorage.getItem('tetrisGlobalRanking') || '[]');
-            
-            if (rankingData.length === 0) {
-                rankingList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">아직 기록이 없습니다</div>';
-                return;
-            }
-            
-            // 점수순으로 정렬
-            rankingData.sort((a, b) => b.score - a.score);
-            
-            // 랭킹 HTML 생성
-            let rankingHTML = '';
-            rankingData.slice(0, 10).forEach((entry, index) => {
-                const rank = index + 1;
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-                const date = new Date(entry.date).toLocaleDateString();
-                
-                rankingHTML += `
-                    <div class="ranking-item">
-                        <div class="rank">${medal}</div>
-                        <div class="player-info">
-                            <div class="player-name">${entry.nickname || 'Anonymous'}</div>
-                            <div class="player-date">${date}</div>
-                        </div>
-                        <div class="score">${entry.score.toLocaleString()}</div>
-                    </div>
-                `;
-            });
-            
-            rankingList.innerHTML = rankingHTML;
-        }
-
-        function showLockedMessage(mode) {
-            let message = '';
-            
-            switch(mode) {
-                case '40planes':
-                    message = '🚧 40 PLANES 모드는 아직 개발 중입니다!\n곧 출시될 예정이니 기다려주세요!';
-                    break;
-                case 'blitz':
-                    message = '🚧 BLITZ 모드는 아직 개발 중입니다!\n곧 출시될 예정이니 기다려주세요!';
-                    break;
-            }
-            
-            // 임시 알림 표시
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                padding: 20px 30px;
-                border-radius: 15px;
-                border: 2px solid #ff6b6b;
-                z-index: 10000;
-                text-align: center;
-                font-size: 1.1em;
-                line-height: 1.5;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-                animation: fadeInOut 2s ease-in-out;
-            `;
-            notification.textContent = message.replace(/\n/g, '\n');
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 2000);
-        }
-
-        // 버튼 초기화 함수
-        function initializeButtons() {
-            console.log('🔧 버튼 초기화 시작');
+        // 간단한 버튼 초기화
+        function simpleInitializeButtons() {
+            console.log('🔧 간단한 버튼 초기화 시작');
             
             // ZEN 버튼
             const zenBtn = document.querySelector('.mode-zen');
@@ -2267,67 +2128,20 @@
                 zenBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🎮 ZEN 버튼 클릭됨');
+                    console.log('🎮 ZEN 버튼 클릭됨 - 게임 시작');
                     startZenGame();
                 });
                 console.log('✅ ZEN 버튼 등록 완료');
-            }
-            
-            // 랭킹 버튼
-            const rankingBtn = document.getElementById('rankingBtn');
-            if (rankingBtn) {
-                rankingBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🏆 랭킹 버튼 클릭됨');
-                    openRanking();
-                });
-                console.log('✅ 랭킹 버튼 등록 완료');
-            }
-            
-            // 잠금된 버튼들
-            const lockedButtons = document.querySelectorAll('.mode-btn.locked');
-            lockedButtons.forEach(btn => {
-                const mode = btn.dataset.mode;
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log(`🔒 잠금된 버튼 클릭됨: ${mode}`);
-                    
-                    // 흔들림 애니메이션
-                    btn.classList.add('shake');
-                    setTimeout(() => {
-                        btn.classList.remove('shake');
-                    }, 500);
-                    
-                    // 메시지 표시
-                    showLockedMessage(mode);
-                });
-            });
-            console.log(`✅ 잠금된 버튼 ${lockedButtons.length}개 등록 완료`);
-            
-            console.log('🎉 모든 버튼 초기화 완료!');
-        }
-
-        // 모든 스크립트가 로드된 후 버튼 초기화
-        function waitForScriptsAndInitialize() {
-            checkScriptStatus();
-            
-            // 모든 필요한 스크립트가 로드되었는지 확인
-            if (typeof THREE !== 'undefined' && typeof Tetris3D !== 'undefined') {
-                console.log('✅ 모든 스크립트 로드 완료');
-                initializeButtons();
             } else {
-                console.log('⏳ 스크립트 로딩 대기 중...');
-                setTimeout(waitForScriptsAndInitialize, 100);
+                console.error('❌ ZEN 버튼을 찾을 수 없습니다');
             }
         }
 
-        // DOM 로드 완료 후 스크립트 확인 및 버튼 초기화
+        // DOM 로드 완료 후 간단한 버튼 초기화
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', waitForScriptsAndInitialize);
+            document.addEventListener('DOMContentLoaded', simpleInitializeButtons);
         } else {
-            waitForScriptsAndInitialize();
+            simpleInitializeButtons();
         }
 
         // 전역 함수로 스크립트 상태 확인 가능
