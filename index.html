@@ -1603,28 +1603,28 @@
             <div class="splash-text">PC version</div>
                 <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
-                <button class="mode-btn mode-40" data-mode="40planes">
+                <button class="mode-btn mode-40" onclick="startGameMode('40planes')" data-mode="40planes">
                     <div class="mode-icon">40P</div>
                     <div class="mode-info">
                         <div class="mode-title">40 PLANES</div>
                         <div class="mode-desc">COMPLETE 40 FULL PLANES AS QUICKLY AS POSSIBLE</div>
                     </div>
                 </button>
-                <button class="mode-btn mode-blitz" data-mode="blitz">
+                <button class="mode-btn mode-blitz" onclick="startGameMode('blitz')" data-mode="blitz">
                     <div class="mode-icon">BLZ</div>
                     <div class="mode-info">
                         <div class="mode-title">BLITZ</div>
                         <div class="mode-desc">A TWO-MINUTE RACE AGAINST THE CLOCK</div>
                     </div>
                 </button>
-                <button class="mode-btn mode-zen" data-mode="zen">
+                <button class="mode-btn mode-zen" onclick="startGameMode('zen')" data-mode="zen">
                     <div class="mode-icon">ZEN</div>
                     <div class="mode-info">
                         <div class="mode-title">ZEN</div>
                         <div class="mode-desc">RELAX OR TRAIN IN THIS NEVERENDING MODE</div>
                     </div>
                 </button>
-                <button class="start-btn secondary" id="rankingBtn">Ranking 🏆</button>
+                <button class="start-btn secondary" onclick="showRanking()" id="rankingBtn">Ranking 🏆</button>
             </div>
             
             <div class="footer">@ made by 💙 with 동혁 (ft. 세윤)</div>
@@ -2015,71 +2015,90 @@
             showMobileControlsIfNeeded();
         });
 
-        // 전역 클릭 이벤트로 모드 버튼 처리
-        document.addEventListener('click', (e) => {
-            const modeBtn = e.target.closest('.mode-btn[data-mode]');
-            if (modeBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                const mode = modeBtn.getAttribute('data-mode');
-                console.log(`🔥 전역 클릭으로 ${mode} 모드 시작!`);
-                startGameMode(mode);
-                return;
-            }
-            
-            const rankingBtn = e.target.closest('#rankingBtn');
-            if (rankingBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🏆 전역 클릭으로 랭킹 열기!');
-                showRanking();
-                return;
-            }
-        });
+        // 즉시 실행되는 전역 이벤트 리스너
+        function setupButtonListeners() {
+            // 전역 클릭 이벤트로 모드 버튼 처리
+            document.addEventListener('click', (e) => {
+                const modeBtn = e.target.closest('.mode-btn[data-mode]');
+                if (modeBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const mode = modeBtn.getAttribute('data-mode');
+                    console.log(`🔥 전역 클릭으로 ${mode} 모드 시작!`);
+                    startGameMode(mode);
+                    return;
+                }
+                
+                const rankingBtn = e.target.closest('#rankingBtn');
+                if (rankingBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🏆 전역 클릭으로 랭킹 열기!');
+                    showRanking();
+                    return;
+                }
+            });
 
-        // 마우스 업 이벤트 추가 (PC용)
-        document.addEventListener('mouseup', (e) => {
-            const modeBtn = e.target.closest('.mode-btn[data-mode]');
-            if (modeBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                const mode = modeBtn.getAttribute('data-mode');
-                console.log(`🖱️ 마우스 업으로 ${mode} 모드 시작!`);
-                startGameMode(mode);
-                return;
-            }
-        });
+            // 마우스 업 이벤트 추가 (PC용)
+            document.addEventListener('mouseup', (e) => {
+                const modeBtn = e.target.closest('.mode-btn[data-mode]');
+                if (modeBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const mode = modeBtn.getAttribute('data-mode');
+                    console.log(`🖱️ 마우스 업으로 ${mode} 모드 시작!`);
+                    startGameMode(mode);
+                    return;
+                }
+            });
 
-        // 터치 이벤트 (모바일용)
-        document.addEventListener('touchend', (e) => {
-            const modeBtn = e.target.closest('.mode-btn[data-mode]');
-            if (modeBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                const mode = modeBtn.getAttribute('data-mode');
-                console.log(`📱 터치로 ${mode} 모드 시작!`);
-                startGameMode(mode);
-                return;
-            }
-            
-            const rankingBtn = e.target.closest('#rankingBtn');
-            if (rankingBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('📱 터치로 랭킹 열기!');
-                showRanking();
-                return;
-            }
-        });
+            // 터치 이벤트 (모바일용)
+            document.addEventListener('touchend', (e) => {
+                const modeBtn = e.target.closest('.mode-btn[data-mode]');
+                if (modeBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const mode = modeBtn.getAttribute('data-mode');
+                    console.log(`📱 터치로 ${mode} 모드 시작!`);
+                    startGameMode(mode);
+                    return;
+                }
+                
+                const rankingBtn = e.target.closest('#rankingBtn');
+                if (rankingBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📱 터치로 랭킹 열기!');
+                    showRanking();
+                    return;
+                }
+            });
+        }
 
-        // 게임 모드 시작 함수
-        function startGameMode(mode) {
+        // 즉시 실행
+        setupButtonListeners();
+
+        // 게임 모드 시작 함수 (전역 함수로 만들기)
+        window.startGameMode = function(mode) {
             console.log(`=== ${mode} 모드 시작 ===`);
             console.log('게임 시작 전 상태:', { gameStarted, game: !!game });
             
             // 바로 게임 시작 (로그인 없이)
             startGame(mode);
-        }
+        };
+
+        // 랭킹 표시 함수 (전역 함수로 만들기)
+        window.showRanking = function() {
+            console.log('🏆 랭킹 모달 열기');
+            if (typeof showRankingModal === 'function') {
+                showRankingModal();
+            } else {
+                console.log('랭킹 데이터 로드 중...');
+                // 로컬 랭킹 데이터 표시
+                const rankingData = JSON.parse(localStorage.getItem('tetrisRanking') || '[]');
+                console.log('로컬 랭킹 데이터:', rankingData);
+            }
+        };
 
         // 기존 startGame 함수 수정 (모드 파라미터 추가)
         function startGame(gameMode = 'zen') {
