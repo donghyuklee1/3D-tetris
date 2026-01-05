@@ -147,6 +147,12 @@
             z-index: 1;
             animation: retroGlow 3s ease-in-out infinite alternate;
         }
+        
+        /* 스플래시 화면 내부 버튼 영역이 클릭 가능하도록 */
+        #splashScreen > * {
+            position: relative;
+            z-index: 1001;
+        }
 
         @keyframes retroScan {
             0% { 
@@ -586,6 +592,8 @@
             flex-direction: column;
             gap: 15px;
             margin-bottom: 30px;
+            position: relative;
+            z-index: 1002; /* 버튼들이 스플래시 화면 위에 오도록 */
         }
 
         .start-btn.secondary {
@@ -627,6 +635,7 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            z-index: 1001 !important; /* 스플래시 화면 위에 버튼이 오도록 */
         }
 
         .mode-btn::before {
@@ -2182,12 +2191,19 @@
         });
 
 
-        // ZEN 게임 시작 함수
-        function startZenGame() {
+        // ZEN 게임 시작 함수 (전역 함수로 노출)
+        window.startZenGame = function() {
             console.log('=== ZEN 게임 시작 함수 호출됨 ===');
             console.log('THREE.js 상태:', typeof THREE);
             console.log('Tetris3D 상태:', typeof Tetris3D);
             console.log('gameStarted 상태:', gameStarted);
+            
+            // 이미 게임이 시작되었으면 리턴
+            if (gameStarted && game) {
+                console.log('게임이 이미 실행 중입니다.');
+                return;
+            }
+            
             // 버튼 클릭 효과 (향상된 모달 효과)
             const zenBtn = document.querySelector('.mode-zen');
             if (zenBtn) {
@@ -2218,6 +2234,7 @@
                 
                 setTimeout(() => {
                     splashScreen.style.display = 'none';
+                    splashScreen.style.pointerEvents = 'none'; // 클릭 이벤트 비활성화
                 }, 500);
             }
             
@@ -2238,6 +2255,7 @@
                         if (splashScreen) {
                             splashScreen.style.display = 'flex';
                             splashScreen.style.opacity = '1';
+                            splashScreen.style.pointerEvents = 'auto';
                         }
                     }
                 } catch (error) {
@@ -2248,9 +2266,15 @@
                     if (splashScreen) {
                         splashScreen.style.display = 'flex';
                         splashScreen.style.opacity = '1';
+                        splashScreen.style.pointerEvents = 'auto';
                     }
                 }
             }, 600);
+        };
+        
+        // 전역 함수로도 사용 가능하도록
+        function startZenGame() {
+            window.startZenGame();
         }
 
         // 페이드 인/아웃 애니메이션 추가
@@ -2429,12 +2453,32 @@
             // 랭킹 버튼 이벤트 리스너 추가
             const rankingBtn = document.getElementById('rankingBtn');
             if (rankingBtn) {
-                rankingBtn.addEventListener('click', () => {
+                rankingBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log('랭킹 버튼 클릭됨');
                     showRanking();
                 });
             } else {
                 console.error('랭킹 버튼을 찾을 수 없습니다');
+            }
+            
+            // ZEN 버튼 이벤트 리스너 추가 (onclick 대신 사용)
+            const zenBtn = document.querySelector('.mode-zen');
+            if (zenBtn) {
+                zenBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('ZEN 버튼 클릭됨 (이벤트 리스너)');
+                    if (typeof window.startZenGame === 'function') {
+                        window.startZenGame();
+                    } else {
+                        console.error('startZenGame 함수를 찾을 수 없습니다');
+                    }
+                });
+                console.log('ZEN 버튼 이벤트 리스너 추가 완료');
+            } else {
+                console.error('ZEN 버튼을 찾을 수 없습니다');
             }
         });
 
