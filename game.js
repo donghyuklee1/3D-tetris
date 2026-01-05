@@ -619,21 +619,43 @@ class Tetris3D {
     
     spawnNewPiece() {
         const pieceType = this.pieceTypes[Math.floor(Math.random() * this.pieceTypes.length)];
+        
+        // 블록의 상대 위치를 확인해서 최대 높이 계산
+        let maxBlockY = 0;
+        for (const block of pieceType.blocks) {
+            // block[1]은 y축 상대 위치 (음수일 수 있음)
+            maxBlockY = Math.max(maxBlockY, -block[1]); // 음수를 양수로 변환
+        }
+        
+        // 새 피스의 시작 위치 계산 - 블록이 보드 상단 밖으로 나가지 않도록
+        // 보드 중앙, 그리고 모든 블록이 보드 안에 들어오도록 시작 위치 조정
+        const startX = Math.floor(this.BOARD_WIDTH / 2) - 1; // 보드 중앙
+        const startZ = Math.floor(this.BOARD_DEPTH / 2) - 1; // 보드 중앙
+        // 최상단 블록이 보드 경계 내에 있도록 시작 Y 위치 설정
+        const startY = this.BOARD_HEIGHT - 1 - maxBlockY;
+        
         this.currentPiece = {
             type: pieceType,
-            position: { x: 1, y: this.BOARD_HEIGHT - 1, z: 1 }, // 4x4 보드의 중앙에서 시작
+            position: { x: startX, y: startY, z: startZ },
             rotation: { x: 0, y: 0, z: 0 },
             blocks: [...pieceType.blocks]
         };
         
+        // 새 피스가 유효한 위치에 있는지 확인 (경계 체크 및 기존 블록과의 충돌)
+        if (this.checkCollision(this.currentPiece.position, this.currentPiece.blocks)) {
+            // 충돌이 있으면 아래로 한 칸 이동 시도 (보드가 비어있을 때는 발생하지 않아야 함)
+            this.currentPiece.position.y -= 1;
+            
+            // 그래도 충돌하면 게임 오버 (보드가 가득 찬 경우)
+            if (this.checkCollision(this.currentPiece.position, this.currentPiece.blocks)) {
+                console.log('게임 오버: 새 피스를 배치할 공간이 없습니다');
+                this.gameOver();
+                return;
+            }
+        }
+        
         this.createPieceVisual();
         this.minimapNeedsUpdate = true; // 미니맵 업데이트 필요
-        
-        // 게임 오버 체크 - 높이가 12를 넘는 경우에만
-        if (this.isBoardHeightExceeded()) {
-            console.log('게임 오버: 보드 높이가 12를 초과');
-            this.gameOver();
-        }
     }
     
     isBoardHeightExceeded() {

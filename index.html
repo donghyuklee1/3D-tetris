@@ -457,27 +457,29 @@
         }
 
         .splash-text {
-            position: absolute;
-            top: 45%;
-            right: 25%;
-            color: #ffd700;
+            position: relative;
+            color: #00f5ff;
             font-family: 'Orbitron', monospace;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transform: rotate(-15deg);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            animation: splashPulse 0.8s ease-in-out infinite alternate;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+            animation: splashPulse 1.2s ease-in-out infinite alternate;
             z-index: 10;
+            letter-spacing: 3px;
         }
 
         @keyframes splashPulse {
             0% {
-                transform: rotate(-15deg) scale(0.85);
-                opacity: 0.7;
+                transform: scale(0.95);
+                opacity: 0.8;
+                text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
             }
             100% {
-                transform: rotate(-15deg) scale(1.15);
+                transform: scale(1.05);
                 opacity: 1;
+                text-shadow: 0 0 30px rgba(0, 245, 255, 0.8);
             }
         }
 
@@ -517,13 +519,17 @@
         }
 
         .subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.85;
             text-align: center;
             font-family: 'Roboto', sans-serif;
             animation: gentlePulse 4s ease-in-out infinite;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            max-width: 600px;
+            padding: 0 20px;
         }
 
         @keyframes gentlePulse {
@@ -1818,8 +1824,8 @@
             </div>
             
             <div class="logo">QUADRIS</div>
-            <div class="splash-text">PC version</div>
-                <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
+            <div class="splash-text">3D TETRIS</div>
+            <div class="subtitle">차원은 하나 올랐지만 난이도는 4배 어려워요 😔</div>
             <div class="main-buttons">
                 <button class="mode-btn mode-40 locked" data-mode="40planes">
                     <div class="mode-icon">40P</div>
