@@ -37,6 +37,8 @@ class Tetris3D {
         this.gamePaused = false;
         this.dropTime = 0;
         this.dropInterval = 1000; // 1초
+        this.gameMode = 'zen'; // 기본 게임 모드
+        this.isAnonymousMode = false; // 익명 모드 플래그
         
         // 랭킹 시스템 (Firebase 연동)
         this.ranking = [];

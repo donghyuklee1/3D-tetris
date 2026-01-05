@@ -2016,23 +2016,16 @@
 
 
 
-        function restartGame() {
-            if (game) {
-                console.log('게임 재시작 중...');
-                game.restartGame();
-                document.getElementById('gameOverModal').classList.remove('show');
-            } else {
-                console.log('게임 인스턴스가 없습니다.');
-            }
-        }
+        // restartGame은 아래에 window.restartGame으로 정의됨
 
-        function togglePause() {
+        // 전역 함수로 만들기
+        window.togglePause = function() {
             if (game) {
                 game.togglePause();
             } else {
                 console.log('게임이 시작되지 않았습니다.');
             }
-        }
+        };
 
             function showSplash() {
                 document.getElementById('gameOverModal').classList.remove('show');
@@ -2058,18 +2051,28 @@
                 console.log('스플래시 화면으로 복귀 완료');
             }
 
-        function showRanking() {
+        // 전역 함수로 만들기
+        window.showRanking = function() {
             console.log('showRanking 함수 호출됨');
             console.log('랭킹 모달 열기');
-            document.getElementById('rankingModal').classList.add('show');
-            
-            // 게임이 실행 중이면 랭킹 업데이트, 아니면 기본 랭킹 로드
-            if (game) {
-                game.updateRankingUI();
+            const rankingModal = document.getElementById('rankingModal');
+            if (rankingModal) {
+                rankingModal.classList.add('show');
+                
+                // 게임이 실행 중이면 랭킹 업데이트, 아니면 기본 랭킹 로드
+                if (game) {
+                    game.updateRankingUI();
+                } else {
+                    // 게임이 시작되지 않은 상태에서도 랭킹 표시
+                    loadBasicRanking();
+                }
             } else {
-                // 게임이 시작되지 않은 상태에서도 랭킹 표시
-                loadBasicRanking();
+                console.error('랭킹 모달을 찾을 수 없습니다');
             }
+        };
+        
+        function showRanking() {
+            window.showRanking();
         }
 
         function loadBasicRanking() {
@@ -2328,11 +2331,15 @@
                 gameOverModal.classList.remove('show');
             }
             
-            // 현재 모드로 다시 시작
-            if (game && game.gameMode) {
+            // 게임이 실행 중이면 게임의 restartGame 메서드 호출
+            if (game && game.restartGame && typeof game.restartGame === 'function') {
+                console.log('게임 재시작 중...');
+                game.restartGame();
+            } else if (game && game.gameMode) {
+                // 게임 인스턴스는 있지만 restartGame 메서드가 없는 경우
                 startGameMode(game.gameMode);
             } else {
-                // 기본적으로 ZEN 모드로 시작
+                // 게임이 없는 경우 ZEN 모드로 시작
                 startGameMode('zen');
             }
         };
@@ -2362,6 +2369,74 @@
         window.showSplash = function() {
             goToMenu();
         };
+
+        // 게임 모드 시작 함수
+        function startGameMode(mode) {
+            console.log('게임 모드 시작:', mode);
+            
+            // 기존 게임이 있으면 정리
+            if (game) {
+                console.log('기존 게임 인스턴스 정리 중...');
+                game.gameRunning = false;
+                game = null;
+            }
+            
+            // 스플래시 화면 숨기기
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) {
+                splashScreen.style.transition = 'opacity 0.5s ease-out';
+                splashScreen.style.opacity = '0';
+                
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
+            }
+            
+            // 게임 시작
+            setTimeout(() => {
+                try {
+                    if (typeof Tetris3D !== 'undefined') {
+                        console.log('Tetris3D 클래스 발견, 게임 시작 중...');
+                        game = new Tetris3D();
+                        game.gameMode = mode;
+                        gameStarted = true;
+                        console.log('게임 시작 완료!');
+                    } else {
+                        console.error('Tetris3D 클래스가 로드되지 않았습니다');
+                        alert('게임을 로드하는 중입니다. 페이지를 새로고침해주세요.');
+                        
+                        // 스플래시 화면 다시 보이기
+                        if (splashScreen) {
+                            splashScreen.style.display = 'flex';
+                            splashScreen.style.opacity = '1';
+                        }
+                    }
+                } catch (error) {
+                    console.error('게임 시작 중 오류:', error);
+                    alert('게임 시작 중 오류가 발생했습니다: ' + error.message);
+                    
+                    // 스플래시 화면 다시 보이기
+                    if (splashScreen) {
+                        splashScreen.style.display = 'flex';
+                        splashScreen.style.opacity = '1';
+                    }
+                }
+            }, 600);
+        }
+
+        // 페이지 로드 시 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            // 랭킹 버튼 이벤트 리스너 추가
+            const rankingBtn = document.getElementById('rankingBtn');
+            if (rankingBtn) {
+                rankingBtn.addEventListener('click', () => {
+                    console.log('랭킹 버튼 클릭됨');
+                    showRanking();
+                });
+            } else {
+                console.error('랭킹 버튼을 찾을 수 없습니다');
+            }
+        });
 
     </script>
 </body>
